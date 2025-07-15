@@ -11,6 +11,26 @@ graph_builder.set_finish_point("agent_executor")
 
 app = graph_builder.compile()
 
+def format_output(result):
+    output = result.get("output", "")
+    intermediate = result.get("intermediate_steps", [])
+    urls = []
+
+    for step in intermediate:
+        observation = step[1]
+        if isinstance(observation, dict) and "images" in observation:
+            for img in observation["images"]:
+                url = img.get("thumbnail")
+                if url and url.startswith("http"):
+                    urls.append(url)
+
+    if urls and "http" not in output:
+        url_str = "\n".join(urls)
+        output += f"\n\n📷 URLs des images :\n" + url_str
+
+    return output
+
+
 if __name__ == "__main__":
     print("🌍 Agent prêt, pose ta question (exit pour quitter)")
     while True:
@@ -19,4 +39,5 @@ if __name__ == "__main__":
             print("👋 Bye")
             break
         result = app.invoke({"input": query})
-        print(f"✅ Réponse : {result.get('output', 'Pas de réponse')}")
+        print(f"✅ Réponse : {format_output(result)}")  # <-- ici, on applique format_output
+

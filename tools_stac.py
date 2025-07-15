@@ -81,12 +81,14 @@ def query_stac_catalog(params: str) -> dict:
             }
         
         return {
-            "collection": collection,
-            "bbox": bbox_str,
-            "start_date": start_date,
-            "end_date": end_date,
-            "images": all_images
-        }
+    "collection": collection,
+    "bbox": bbox_str,
+    "start_date": start_date,
+    "end_date": end_date,
+    "images": all_images,
+    "urls": [img["thumbnail"] for img in all_images if "thumbnail" in img]
+}
+
     
     except Exception as e:
         return {"error": f"❌ Erreur lors de la requête STAC: {str(e)}"}
