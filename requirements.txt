@@ -1,0 +1,9 @@
+requests
+pandas
+folium
+geopy
+langchain
+langchain_ollama
+pystac_client
+pycountry
+dateparser
