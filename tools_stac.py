@@ -92,4 +92,5 @@ def query_stac_catalog(params: str) -> dict:
     
     except Exception as e:
         return {"error": f"❌ Erreur lors de la requête STAC: {str(e)}"}
-
+    
+    

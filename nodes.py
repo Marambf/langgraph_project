@@ -34,7 +34,7 @@ def create_agent_executor():
 
     llm = OllamaLLM(
         model="mistral",
-        temperature=0.2,
+        temperature=0.1,
         system_prompt=system_prompt_str,
     )
 
@@ -51,3 +51,18 @@ def create_agent_executor():
     )
 
     return agent_executor
+
+from tools_risk import extract_bbox_and_dates, query_stac_catalog_with_retry
+
+def run_query_direct(user_input: str):
+    result = extract_bbox_and_dates(user_input)
+    if "error" in result:
+        return result["error"]
+
+    bbox = result["bbox"]
+    start = result["start_date"]
+    end = result["end_date"]
+    collection = result["collection"]
+
+    params = f"{bbox} {start} {end} {collection}"
+    return query_stac_catalog_with_retry(params)
