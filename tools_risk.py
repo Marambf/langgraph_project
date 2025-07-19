@@ -4,7 +4,7 @@ from tools_stac import query_stac_catalog
 from langchain.tools import tool
 import calendar
 import re
-from tools_geocode import get_city_coordinates 
+from tools_geocode import get_city_bbox
 from tools_weather import get_weather_data
 import re
 from datetime import datetime
@@ -19,29 +19,32 @@ mois_map = {
 def extract_dates_from_text(text: str):
     text = text.lower()
 
-    # 1. Intervalle complet : entre 5 mai 2023 et 12 juin 2023
+    mois_map = {
+        "janvier": "01", "février": "02", "mars": "03", "avril": "04",
+        "mai": "05", "juin": "06", "juillet": "07", "août": "08",
+        "septembre": "09", "octobre": "10", "novembre": "11", "décembre": "12"
+    }
+
+    # Format FR : entre 5 mai 2023 et 12 juin 2023
     match = re.search(
-        r"entre\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})\s+et\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})",
-        text)
+        r"entre\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})\s+et\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})", text)
     if match:
         d1, m1, y1, d2, m2, y2 = match.groups()
         return f"{y1}-{mois_map[m1]:s}-{int(d1):02d}", f"{y2}-{mois_map[m2]:s}-{int(d2):02d}"
 
-    # 2. Intervalle simple : entre 1 et 9 juin 2023
-    match = re.search(
-        r"entre\s+(\d{1,2})\s+et\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})",
-        text)
+    # Format FR : entre 1 et 9 juin 2023
+    match = re.search(r"entre\s+(\d{1,2})\s+et\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})", text)
     if match:
         d1, d2, m, y = match.groups()
         return f"{y}-{mois_map[m]:s}-{int(d1):02d}", f"{y}-{mois_map[m]:s}-{int(d2):02d}"
 
-    # 3. Forme "du 01/06/2023 au 09/06/2023"
+    # Format FR court : du 01/06/2023 au 09/06/2023
     match = re.search(r"du\s+(\d{2})/(\d{2})/(\d{4})\s+au\s+(\d{2})/(\d{2})/(\d{4})", text)
     if match:
         d1, m1, y1, d2, m2, y2 = match.groups()
         return f"{y1}-{m1}-{d1}", f"{y2}-{m2}-{d2}"
 
-    # 4. Mois complet : "juin 2023"
+    # Mois complet : "juin 2023"
     match = re.search(r"(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})", text)
     if match:
         m, y = match.groups()
@@ -50,14 +53,36 @@ def extract_dates_from_text(text: str):
         end = f"{y}-{mois_map[m]:s}-{end_day:02d}"
         return start, end
 
-    # 5. Une seule date : "le 7 juillet 2023"
+    # Une seule date FR : "le 7 juillet 2023"
     match = re.search(r"le\s+(\d{1,2})\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})", text)
     if match:
         d, m, y = match.groups()
         date = f"{y}-{mois_map[m]:s}-{int(d):02d}"
         return date, date
 
-    return None, None  # si aucune date reconnue
+    # Format ISO standard : 2023-06-01 à 2023-06-09
+    match = re.search(r"(\d{4}-\d{2}-\d{2})\s*(au|to|-)\s*(\d{4}-\d{2}-\d{2})", text)
+    if match:
+        return match.group(1), match.group(3)
+
+    # Date unique en format ISO : 2023-06-07
+    match = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", text)
+    if match:
+        return match.group(1), match.group(1)
+
+    # Format anglais : July 7, 2023
+    match = re.search(r"(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})", text)
+    if match:
+        m, d, y = match.groups()
+        month_num = {
+            "january": "01", "february": "02", "march": "03", "april": "04",
+            "may": "05", "june": "06", "july": "07", "august": "08",
+            "september": "09", "october": "10", "november": "11", "december": "12"
+        }
+        return f"{y}-{month_num[m]:s}-{int(d):02d}", f"{y}-{month_num[m]:s}-{int(d):02d}"
+
+    return None, None
+
 
 @tool
 def get_date() -> str:
@@ -141,7 +166,7 @@ def extract_bbox_and_dates(user_input: str) -> dict:
 
         user_input = user_input.strip().lower()
 
-        # --- Détection des dates via ta fonction générique ---
+        # --- Détection des dates via la fonction générique ---
         start_date, end_date = extract_dates_from_text(user_input)
         if not start_date or not end_date:
             return {"error": "❌ Impossible de déterminer les dates."}
@@ -169,10 +194,10 @@ def extract_bbox_and_dates(user_input: str) -> dict:
         city_match = re.search(r"de\s+([a-zA-Zéèàùçâêîôû\s\-]+?)(?=\s+(en|\d{4}|sentinel)|$)", user_input, re.IGNORECASE)
         if city_match:
             city = city_match.group(1).strip().title()
-            lat, lon, _ = get_city_coordinates(city)
-            if lat is None or lon is None:
-                return {"error": f"❌ Ville '{city}' introuvable."}
-            bbox = f"{lon-0.1},{lat-0.1},{lon+0.1},{lat+0.1}"
+            min_lon, min_lat, max_lon, max_lat, city_name = get_city_bbox(city)
+            if None in (min_lon, min_lat, max_lon, max_lat):
+                return {"error": f"❌ Ville '{city}' introuvable ou bbox indisponible."}
+            bbox = f"{min_lon},{min_lat},{max_lon},{max_lat}"
         else:
             return {"error": "❌ Impossible de détecter la ville dans la requête."}
 
@@ -181,16 +206,15 @@ def extract_bbox_and_dates(user_input: str) -> dict:
             "start_date": start_date,
             "end_date": end_date,
             "collection": collection,
-            "city": city
+            "city": city_name
         }
 
     except Exception as e:
         return {"error": f"❌ Erreur dans extract_bbox_and_dates: {str(e)}"}
 
+
    
     
-from datetime import datetime, timedelta
-
 def query_stac_with_retries(bbox_str, start_date_str, end_date_str, collection, query_func):
     """
     Effectue jusqu’à 3 tentatives de requête STAC en ajustant les dates si aucune image n’est trouvée.
@@ -243,22 +267,27 @@ def query_stac_with_retries(bbox_str, start_date_str, end_date_str, collection, 
         attempt += 1
 
 
-
 @tool
 def query_stac_catalog_with_retry(params: str) -> dict:
     """
-    Wrapper exposé en tant qu’outil LangChain qui encapsule la fonction query_stac_with_retries.
-
-    Prend en entrée la chaîne params (format bbox start_date end_date collection), 
-    découpe les paramètres et effectue plusieurs essais de requêtes STAC en cas d’échec.
-
-    Retourne un dictionnaire de résultats ou un message d’erreur.
+    Wrapper qui accepte des paramètres bruts OU clé=valeur.
     """
     try:
-        bbox_str, start_date, end_date, collection = params.split(" ")
+        if "=" in params:
+            # Format clé=valeur détecté
+            kv = dict(re.findall(r"(\w+)=([^\s]+)", params))
+            bbox_str = ",".join([kv["lon_min"], kv["lat_min"], kv["lon_max"], kv["lat_max"]])
+            start_date = kv["start_date"]
+            end_date = kv["end_date"]
+            collection = kv["collection"]
+        else:
+            # Format brut
+            bbox_str, start_date, end_date, collection = params.split(" ")
+
         return query_stac_with_retries(bbox_str, start_date, end_date, collection, query_stac_catalog)
     except Exception as e:
         return {"error": f"❌ Erreur dans query_stac_catalog_with_retry: {str(e)}"}
+
 
 
 def get_all_tools():
@@ -268,7 +297,7 @@ def get_all_tools():
         calculator,
         extract_bbox_and_dates,
         query_stac_catalog,
-        query_stac_catalog_with_retry,  # <-- ici on utilise la version avec retry
+        query_stac_catalog_with_retry, 
         adjust_date,
         get_weather_data,
         date_subtract

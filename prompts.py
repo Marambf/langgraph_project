@@ -51,7 +51,7 @@ examples = [
         "question": "Calcule 23 * 17 et donne-moi la météo à Tunis",
         "response": (
             "Action: calculator('23*17')\nObservation: 391\n"
-            "Action: query_stac_catalog('Tunis 2025-07-06 2025-07-06 sentinel-2-l2a')\nObservation: Ensoleillé, 28°C\n"
+            "Action: weather('Tunis')\nObservation: Ensoleillé, 28°C\n"
             "Final Answer: Le résultat de 23 * 17 est 391. La météo à Tunis aujourd'hui (6 juillet 2025) : Ensoleillé, 28°C."
         )
     },
@@ -70,10 +70,10 @@ examples = [
             "Final Answer: L'indice de végétation autour de Lyon est de 0.82 (élevé)"
         )
     },
-     {
+    {
         "question": "Images Sentinel-2 entre 10.1,36.7,10.3,36.9 du 1er au 10 juillet 2025",
         "response": (
-            "Action: query_stac_catalog('10.1,36.7,10.3,36.9 2025-07-01 2025-07-10 sentinel-2-l2a')\n"
+            "Action: get_satellite_images('10.1,36.7,10.3,36.9 2025-07-01 2025-07-10 sentinel-2-l2a')\n"
             "Observation: 3 images disponibles\n"
             "Final Answer: Voici les images Sentinel-2 pour la zone spécifiée : "
             "(https://example.com/S2A_20250702), "
@@ -81,6 +81,14 @@ examples = [
             "(https://example.com/S2A_20250709)"
         )
     },
+    {
+        "question": "What time is it?",
+        "response": (
+            "Action: get_time()\nObservation: 15h42\n"
+            "Final Answer: The current time is 15h42."
+        )
+    }
+,
     {
         "question": "What time is it?",
         "response": (
@@ -99,7 +107,7 @@ examples = [
         {
         "question": "Images Sentinel-1 de Marseille du 1er au 15 septembre 2023",
         "response": (
-            "Action: query_stac_catalog('Marseille 2023-09-01 2023-09-15 sentinel-1-grd')\n"
+            "Action: get_satellite_images('Marseille 2023-09-01 2023-09-15 sentinel-1-grd')\n"
             "Observation: 4 images disponibles\n"
             "Final Answer: Voici les images Sentinel-1 : "
             "(https://example.com/S1A_20230903_GRD), "
