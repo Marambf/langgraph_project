@@ -1,3 +1,4 @@
+#prompts.py
 """
 prompts.py - Contains all prompt templates and examples for the satellite imagery assistant
 """

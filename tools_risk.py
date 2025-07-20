@@ -212,9 +212,8 @@ def extract_bbox_and_dates(user_input: str) -> dict:
     except Exception as e:
         return {"error": f"❌ Erreur dans extract_bbox_and_dates: {str(e)}"}
 
-
    
-    
+   
 def query_stac_with_retries(bbox_str, start_date_str, end_date_str, collection, query_func):
     """
     Effectue jusqu’à 3 tentatives de requête STAC en ajustant les dates si aucune image n’est trouvée.
@@ -267,6 +266,8 @@ def query_stac_with_retries(bbox_str, start_date_str, end_date_str, collection, 
         attempt += 1
 
 
+import re
+
 @tool
 def query_stac_catalog_with_retry(params: str) -> dict:
     """
@@ -287,6 +288,8 @@ def query_stac_catalog_with_retry(params: str) -> dict:
         return query_stac_with_retries(bbox_str, start_date, end_date, collection, query_stac_catalog)
     except Exception as e:
         return {"error": f"❌ Erreur dans query_stac_catalog_with_retry: {str(e)}"}
+
+
 
 
 

@@ -1,8 +1,6 @@
 #tools_geocode.py
 import requests
 
-import requests
-
 def get_city_bbox(city_name):
     url = f'https://nominatim.openstreetmap.org/search?q={city_name}&format=json&limit=1'
     try:
@@ -24,5 +22,6 @@ def get_city_bbox(city_name):
             return None, None, None, None, city_name
     except Exception:
         return None, None, None, None, city_name
+
 
 
