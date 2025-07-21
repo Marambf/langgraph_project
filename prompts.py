@@ -59,7 +59,7 @@ examples = [
     {
         "question": "Images Sentinel-2 de Paris entre le 1er et 15 juin 2023",
         "response": (
-            "Action: query_stac_catalog('Paris 2023-06-01 2023-06-15 sentinel-2-l2a')\nObservation: 5 images disponibles\n"
+            "Action: get_satellite_images('Paris 2023-06-01 2023-06-15 sentinel-2-l2a')\nObservation: 5 images disponibles\n"
             "Final Answer: Voici les images Sentinel-2 : (https://example.com/S2A_20230605), (https://example.com/S2A_20230612), (https://example.com/S2A_20230620)"
         )
     },

@@ -154,12 +154,8 @@ def adjust_date(user_input: str) -> str:
         return f"❌ Erreur d'ajustement de date: {str(e)}"
 
 
-@tool
+
 def extract_bbox_and_dates(user_input: str) -> dict:
-    """
-    Extrait bbox, start_date, end_date, collection et ville depuis une phrase libre.
-    Accepte formats comme : 'entre 1 et 9 juin 2023', 'du 01/06/2023 au 09/06/2023', etc.
-    """
     try:
         if isinstance(user_input, dict):
             user_input = user_input.get("user_input", "")
@@ -291,14 +287,11 @@ def query_stac_catalog_with_retry(params: str) -> dict:
 
 
 
-
-
 def get_all_tools():
     return [
         get_date,
         get_time,
         calculator,
-        extract_bbox_and_dates,
         query_stac_catalog,
         query_stac_catalog_with_retry, 
         adjust_date,
