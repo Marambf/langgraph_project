@@ -6,6 +6,8 @@ import calendar
 import re
 from tools_geocode import get_city_bbox
 from tools_weather import get_weather_data
+from fire_detection import detect_fire_tool
+
 import re
 from datetime import datetime
 from calendar import monthrange
@@ -296,5 +298,6 @@ def get_all_tools():
         query_stac_catalog_with_retry, 
         adjust_date,
         get_weather_data,
-        date_subtract
+        date_subtract,
+        detect_fire_tool
     ]

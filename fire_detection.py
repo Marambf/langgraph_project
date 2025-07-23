@@ -1,127 +1,158 @@
-from langchain.tools import tool
-import requests
+from datetime import datetime, timedelta, date
 import pandas as pd
+import requests
 import folium
-from datetime import datetime
-from geopy.geocoders import Nominatim
-from math import radians, sin, cos, sqrt, atan2
+import numpy as np
+import os
+
+MAP_KEY = 'f44596f0cc01c26985abd6bfff78ac92'
+ARCHIVE_DIR = r"C:\Users\DELL\Desktop\fire_archives"
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371
+    phi1, phi2 = np.radians(lat1), np.radians(lat2)
+    dphi = np.radians(lat2 - lat1)
+    dlambda = np.radians(lon2 - lon1)
+    a = np.sin(dphi/2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(dlambda/2)**2
+    return 2 * R * np.arcsin(np.sqrt(a))
+
+def get_city_coordinates(city_name):
+    url = f'https://nominatim.openstreetmap.org/search?q={city_name}&format=json&limit=1'
+    try:
+        response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+        data = response.json()
+        if not data:
+            return None, None
+        return float(data[0]['lat']), float(data[0]['lon'])
+    except:
+        return None, None
+
+def find_archive_file_for_date(date_obj):
+    for filename in sorted(os.listdir(ARCHIVE_DIR)):
+        if filename.endswith(".csv") and "fire_archive_" in filename:
+            try:
+                parts = filename.replace(".csv", "").split("_")
+                start_year = int(parts[2])
+                end_year = int(parts[3])
+                start_date = datetime(start_year, 1, 21).date()
+                end_date = datetime(end_year, 1, 20).date()
+                if start_date <= date_obj <= end_date:
+                    return os.path.join(ARCHIVE_DIR, filename)
+            except:
+                continue
+    return None
+
+def should_use_api(input_date_str):
+    input_date = datetime.strptime(input_date_str, "%Y-%m-%d").date()
+    return input_date >= (date.today() - timedelta(days=7))
+
+def detect_fire_near_city(date_str, city_name, radius_km=100):
+    date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+    lat_city, lon_city = get_city_coordinates(city_name)
+    if lat_city is None:
+        return None
+
+    use_api = should_use_api(date_str)
+
+    if use_api:
+        url = f'https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_NOAA20_NRT/world/3'
+        try:
+            df = pd.read_csv(url)
+        except:
+            return None
+    else:
+        file_path = find_archive_file_for_date(date_obj)
+        if not file_path:
+            return None
+        try:
+            df = pd.read_csv(file_path)
+        except:
+            return None
+
+    if "acq_date" not in df.columns or "latitude" not in df.columns or "longitude" not in df.columns:
+        return None
+
+    df = df[df["acq_date"] == date_str].copy()
+    if df.empty:
+        return None
+
+    df["distance"] = df.apply(lambda row: haversine(lat_city, lon_city, row["latitude"], row["longitude"]), axis=1)
+    df_filtered = df[df["distance"] <= radius_km]
+
+    m = folium.Map(location=[lat_city, lon_city], zoom_start=7)
+    for _, row in df_filtered.iterrows():
+        popup = f"Brightness: {row.get('brightness', row.get('bright_ti4', 'N/A'))}, Date: {row['acq_date']}, Time: {row['acq_time']}"
+        folium.CircleMarker(
+            location=[row['latitude'], row['longitude']],
+            radius=5,
+            color='red',
+            fill=True,
+            fill_color='red',
+            fill_opacity=0.7,
+            popup=popup
+        ).add_to(m)
+
+    filename = f"incendies_{city_name.lower().replace(' ', '_')}_{date_str}.html"
+    m.save(filename)
+    return filename, len(df_filtered)
+
+import re
+
+def extract_params_from_text(text):
+    """
+    Extrait date (YYYY-MM-DD), ville, rayon (en km) depuis un texte libre.
+    """
+    date_match = re.search(r'\b(\d{4}-\d{2}-\d{2})\b', text)
+    date_str = date_match.group(1) if date_match else None
+
+    rayon_match = re.search(r'(\d+)\s?km', text)
+    rayon_km = int(rayon_match.group(1)) if rayon_match else 100  # défaut 100 km
+
+    ville_match = re.search(r'(?:à|dans|autour de)\s+([A-Za-z\s\-]+)', text)
+    ville = ville_match.group(1).strip() if ville_match else None
+
+    return date_str, ville, rayon_km
+
+from langchain.tools import tool
 
 @tool
-def fire_detection_api_tool(city_name: str, target_date: str) -> str:
+def detect_fire_tool(query_text: str) -> str:
     """
-    Detect fires around a city on a given date using NASA FIRMS real-time API.
-    Returns summary and map.
-    """
-    try:
-        # Get city coordinates
-        geolocator = Nominatim(user_agent="geoapi")
-        location = geolocator.geocode(city_name)
-        if location is None:
-            return f"City '{city_name}' not found."
-        latitude, longitude = location.latitude, location.longitude
+    Tool pour détecter des incendies à partir d'une requête en langage naturel.
 
-        # NASA FIRMS API endpoint
-        api_url = (
-            "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
-            "MAP_KEY/VIIRS_SNPP_NRT/world/100"
-        )  # replace MAP_KEY with your actual key
+    Cette fonction reçoit une phrase contenant une ville, une date au format YYYY-MM-DD,
+    et éventuellement un rayon en kilomètres. Elle extrait ces informations,
+    appelle la fonction principale de détection d'incendies autour de la ville à la date donnée,
+    puis retourne un résumé clair du résultat.
 
-        # Request fire data
-        response = requests.get(api_url)
-        df = pd.read_csv(pd.compat.StringIO(response.text))
+    Exemple de requête acceptée :
+        "Y a-t-il des incendies à Marseille le 2023-07-21 dans un rayon de 50 km ?"
 
-        # Parse and filter date
-        df["acq_date"] = pd.to_datetime(df["acq_date"]).dt.date
-        input_date = datetime.strptime(target_date, "%Y-%m-%d").date()
-        df_filtered = df[df["acq_date"] == input_date]
+    Paramètres :
+    -----------
+    query_text : str
+        La requête utilisateur en langage naturel contenant ville, date et éventuellement rayon.
 
-        # Distance filter
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371
-            d_lat = radians(lat2 - lat1)
-            d_lon = radians(lon2 - lon1)
-            a = sin(d_lat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(d_lon / 2) ** 2
-            return R * 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        df_filtered["distance"] = df_filtered.apply(
-            lambda row: haversine(latitude, longitude, row["latitude"], row["longitude"]),
-            axis=1
-        )
-        df_filtered = df_filtered[df_filtered["distance"] <= 100]
-
-        # Map
-        fire_map = folium.Map(location=[latitude, longitude], zoom_start=6)
-        for _, row in df_filtered.iterrows():
-            folium.CircleMarker(
-                location=[row["latitude"], row["longitude"]],
-                radius=5,
-                color="red",
-                fill=True,
-                fill_opacity=0.6,
-            ).add_to(fire_map)
-
-        map_path = f"fire_map_{city_name}_{target_date}.html"
-        fire_map.save(map_path)
-
-        return f"{len(df_filtered)} fire events detected around {city_name} on {target_date}. Map saved at {map_path}"
-
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-
-@tool
-def fire_detection_csv_tool(csv_file_path: str, city_name: str, target_date: str) -> str:
-    """
-    Detect fires from NASA FIRMS CSV archive near a city and date.
-    Returns summary and map.
+    Retour :
+    --------
+    str
+        Un message résumant la détection des incendies : nombre, lieu, date,
+        rayon, et fichier HTML généré avec la carte interactive.
+        Retourne un message d'erreur si l'analyse échoue.
     """
     try:
-        # Read CSV
-        df = pd.read_csv(csv_file_path)
+        date_str, ville, rayon_km = extract_params_from_text(query_text)
 
-        required_columns = ["latitude", "longitude", "acq_date"]
-        if not all(col in df.columns for col in required_columns):
-            return "Missing required columns in the CSV."
+        if not date_str or not ville:
+            return "❌ Veuillez préciser une **ville** et une **date au format YYYY-MM-DD** dans votre requête."
 
-        # City coords
-        geolocator = Nominatim(user_agent="geoapi")
-        location = geolocator.geocode(city_name)
-        if location is None:
-            return f"City '{city_name}' not found."
-        lat, lon = location.latitude, location.longitude
+        resultat = detect_fire_near_city(date_str, ville, rayon_km)
+        if not resultat:
+            return f"❌ Aucun incendie détecté ou problème lors du traitement de la requête pour **{ville}** le **{date_str}**."
 
-        df["acq_date"] = pd.to_datetime(df["acq_date"]).dt.date
-        date_obj = datetime.strptime(target_date, "%Y-%m-%d").date()
-        df = df[df["acq_date"] == date_obj]
-
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371
-            d_lat = radians(lat2 - lat1)
-            d_lon = radians(lon2 - lon1)
-            a = sin(d_lat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(d_lon / 2) ** 2
-            return R * 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        df["distance"] = df.apply(lambda row: haversine(lat, lon, row["latitude"], row["longitude"]), axis=1)
-        df = df[df["distance"] <= 100]
-
-        # Map
-        fire_map = folium.Map(location=[lat, lon], zoom_start=6)
-        for _, row in df.iterrows():
-            folium.CircleMarker(
-                location=[row["latitude"], row["longitude"]],
-                radius=5,
-                color="orange",
-                fill=True,
-                fill_opacity=0.6,
-            ).add_to(fire_map)
-
-        map_file = f"fire_csv_map_{city_name}_{target_date}.html"
-        fire_map.save(map_file)
-
-        return f"{len(df)} fire events found around {city_name} on {target_date} in archive. Map: {map_file}"
+        fichier, nb_incendies = resultat
+        return f"✅ {nb_incendies} incendie(s) détecté(s) autour de {ville} le {date_str} dans un rayon de {rayon_km} km.\n🗺️ Carte : {fichier}"
 
     except Exception as e:
-        return f"Error: {str(e)}"
-    
+        return f"❌ Erreur inattendue lors du traitement : {str(e)}"
 
-    

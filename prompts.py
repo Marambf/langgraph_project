@@ -117,8 +117,34 @@ examples = [
             "(https://example.com/S1A_20230912_GRD)"
         )
     },
-    
- 
+    {
+    "question": "Y a-t-il eu des incendies près de Gafsa entre le 1er et le 10 août 2023 ?",
+    "response": (
+        "Action: detect_fire_tool(city_name='Gafsa', target_date='2023-08-01 to 2023-08-10')\n"
+        "Observation: 12 foyers d'incendies détectés entre le 1er et le 10 août 2023 près de Gafsa.\n"
+        "Final Answer: 12 incendies ont été détectés autour de Gafsa entre le 1er et le 10 août 2023."
+    )
+}
+,
+    {
+    "question": "Were there any fires near Algiers in July 2022?",
+    "response": (
+        "Action: detect_fire_tool(city_name='Algiers', target_date='2022-07-01 to 2022-07-31')\n"
+        "Observation: 8 fire events recorded near Algiers during July 2022.\n"
+        "Final Answer: Yes, 8 fires were recorded near Algiers in July 2022."
+    )
+},
+
+    {
+    "question": "Incendies récents autour de Bizerte ?",
+    "response": (
+        "Action: get_date()\n"
+        "Observation: 2025-07-21\n"
+        "Action: detect_fire_tool(city_name='Bizerte', target_date='2025-07-21')\n"
+        "Observation: 3 foyers actifs détectés le 21 juillet 2025 autour de Bizerte.\n"
+        "Final Answer: 3 incendies sont actuellement actifs autour de Bizerte (détectés le 21 juillet 2025)."
+    )
+}
 ]
 
 # Template for each example
