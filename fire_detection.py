@@ -1,3 +1,4 @@
+#fire_detection.py
 from datetime import datetime, timedelta, date
 import pandas as pd
 import requests
@@ -100,7 +101,7 @@ import re
 
 def extract_params_from_text(text):
     """
-    Extrait date (YYYY-MM-DD), ville, rayon (en km) depuis un texte libre.
+    Extrait une date (YYYY-MM-DD), une ville, et un rayon depuis un texte libre.
     """
     date_match = re.search(r'\b(\d{4}-\d{2}-\d{2})\b', text)
     date_str = date_match.group(1) if date_match else None
@@ -108,8 +109,21 @@ def extract_params_from_text(text):
     rayon_match = re.search(r'(\d+)\s?km', text)
     rayon_km = int(rayon_match.group(1)) if rayon_match else 100  # défaut 100 km
 
-    ville_match = re.search(r'(?:à|dans|autour de)\s+([A-Za-z\s\-]+)', text)
-    ville = ville_match.group(1).strip() if ville_match else None
+    # 🔁 Amélioration : recherche du mot de type ville au début si pas de préposition détectée
+    ville_match = re.search(r"(?:à|dans|autour de|près de|proche de|vers)\s+([A-Za-zÀ-ÖØ-öø-ÿ\s\-']+)", text)
+    
+    if not ville_match:
+        # Si pas de préposition, on tente de prendre le premier mot alphabétique avant la date
+        if date_match:
+            possible_ville = text[:date_match.start()].strip()
+            if possible_ville:
+                ville = possible_ville
+            else:
+                ville = None
+        else:
+            ville = None
+    else:
+        ville = ville_match.group(1).strip()
 
     return date_str, ville, rayon_km
 

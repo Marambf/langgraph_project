@@ -9,29 +9,31 @@ from langchain.prompts import FewShotPromptTemplate, PromptTemplate
 system_prompt = """
 You are an intelligent assistant with access to various external tools to help answer user questions accurately. Please follow these essential rules:
 
-1. Language: Always respond in the user's language (English or French).
-2. Tool Use:
+1. Language: Always respond in the language used by the user, whether it is English, French, or any other language. Ensure your understanding and response match the language of the input.2. Tool Use:
    - Use available tools only when needed to answer the question.
    - Never repeat the same tool call unless the user asked to.
-3. Clarity & Structure:
+   - If a tool call is made, always provide the output in the final answer.
+
+
+2. Clarity & Structure:
    - Keep your responses clear, concise, and well-organized.
    - Do not continue reasoning once you have the necessary information.
-4. Relevance:
+3. Relevance:
    - Answer only the question asked. Do not assume extra intentions or add unrelated details.
-5. Final Response Format:
+4. Final Response Format:
    - Once you obtain an Observation, immediately return the response as:
     Final Answer: [your clear and concise reply]
-6. Completeness:
+5. Completeness:
    - Always include all relevant data obtained from tools (e.g., **all URLs**, values, statistics).
    - Never summarize or omit URLs. If multiple are returned, display them **explicitly and completely**.
    - Don’t omit tool outputs, even if the user didn’t explicitly request them.
-7. Defaults:
+6. Defaults:
    - If the user omits important details (e.g. date for weather), apply a sensible default (e.g., today’s date).
 
 Available Tools (examples):
 - get_date, get_time, calculator  
 - get_external_data, get_weather_data, get_satellite_data  
-- get_summary_stats, get_map_link
+- get_summary_stats, get_map_link 
 
 
 """
@@ -43,16 +45,20 @@ examples = [
     {
         "question": "Quelle est la date et l'heure actuelle ?",
         "response": (
-            "Action: get_date()\nObservation: 01/07/2025\n"
-            "Action: get_time()\nObservation: 14h30\n"
+            "Action: get_date()\n"
+            "Observation: 01/07/2025\n"
+            "Action: get_time()\n"
+            "Observation: 14h30\n"
             "Final Answer: Nous sommes le 01/07/2025 et il est 14h30."
         )
     },
     {
         "question": "Calcule 23 * 17 et donne-moi la météo à Tunis",
         "response": (
-            "Action: calculator('23*17')\nObservation: 391\n"
-            "Action: weather('Tunis')\nObservation: Ensoleillé, 28°C\n"
+            "Action: calculator('23*17')\n"
+            "Observation: 391\n"
+            "Action: weather('Tunis')\n"
+            "Observation: Ensoleillé, 28°C\n"
             "Final Answer: Le résultat de 23 * 17 est 391. La météo à Tunis aujourd'hui (6 juillet 2025) : Ensoleillé, 28°C."
         )
     },
@@ -83,28 +89,22 @@ examples = [
         )
     },
     {
-        "question": "What time is it?",
+        "question": "Quelle heure est-il?",
         "response": (
-            "Action: get_time()\nObservation: 15h42\n"
-            "Final Answer: The current time is 15h42."
+            "Action: get_time()\n"
+            "Observation: 15h42\n"
+            "Final Answer: Il est 15h42."
         )
-    }
-,
-    {
-        "question": "What time is it?",
-        "response": (
-            "Action: get_time()\nObservation: 15h42\n"
-            "Final Answer: The current time is 15h42."
-        )
-    }
-,
+    },
     {
         "question": "Quelle est la date d'aujourd'hui ?",
         "response": (
-            "Action: get_date()\nObservation: 10/07/2025\n"
+            "Action: get_date()\n"
+            "Observation: 10/07/2025\n"
             "Final Answer: Nous sommes le 10/07/2025."
     )
     },
+    
         {
         "question": "Images Sentinel-1 de Marseille du 1er au 15 septembre 2023",
         "response": (
@@ -144,7 +144,38 @@ examples = [
         "Observation: 3 foyers actifs détectés le 21 juillet 2025 autour de Bizerte.\n"
         "Final Answer: 3 incendies sont actuellement actifs autour de Bizerte (détectés le 21 juillet 2025)."
     )
+},
+{
+    "question": "Montre-moi les inondations en France le 3 juin 2023",
+    "response": (
+        "Action: detect_flood_tool(location='France', target_date='2023-06-03')\n"
+        "Observation: Inondations détectées à France entre 2023-06-03 et 2023-06-03 :\n"
+        "- Flood in Paris (2023-06-03 ➝ 2023-06-03)\n"
+        "Final Answer: Une inondation a été détectée à Paris le 3 juin 2023."
+    )
+},
+{
+    "question": "Show me the floods in Italy on May 10, 2022",
+    "response": (
+        "Action: detect_flood_tool(location='Italy', target_date='2022-05-10')\n"
+        "Observation: Floods detected in Italy between 2022-05-10 and 2022-05-10:\n"
+        "- Flood in Venice (2022-05-10 ➝ 2022-05-10)\n"
+        "Final Answer: A flood was detected in Venice on May 10, 2022."
+    )
+},
+{
+    "question": "Quelles sont les inondations survenues en Allemagne entre janvier et mars 2023 ?",
+    "response": (
+        "Action: detect_flood_tool(location='Allemagne', start_date='2023-01-01', end_date='2023-03-31')\n"
+        "Observation: Inondations détectées en Allemagne entre 2023-01-01 et 2023-03-31 :\n"
+        "- Flood in Berlin (2023-01-15 ➝ 2023-01-17)\n"
+        "- Flood in Hamburg (2023-03-02 ➝ 2023-03-03)\n"
+        "Final Answer: Deux inondations ont été détectées en Allemagne entre janvier et mars 2023 : à Berlin et à Hambourg."
+    )
 }
+
+
+
 ]
 
 # Template for each example
