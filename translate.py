@@ -20,3 +20,15 @@ def translate_from_english(text: str, target_lang: str) -> str:
         return GoogleTranslator(source='en', target=target_lang).translate(text)
     except:
         return text
+
+def detect_and_translate_to_english(text: str):
+    """
+    Détecte la langue, traduit en anglais si besoin,
+    et retourne (texte_en_anglais, langue_détectée)
+    """
+    lang = detect_language(text)
+    if lang != "en":
+        translated = translate_to_english(text)
+    else:
+        translated = text
+    return translated, lang

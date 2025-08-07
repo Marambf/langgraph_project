@@ -5,6 +5,8 @@ from nodes import run_query_direct, create_agent_executor
 import streamlit.components.v1 as components
 import re
 import os
+from translate import detect_and_translate_to_english, translate_from_english
+
 
 # Configuration de la page
 st.set_page_config(page_title="STAC & Fire Chatbot", layout="centered")
@@ -34,10 +36,19 @@ def is_satellite_query(text: str) -> bool:
 
 # Fonction traduisant et traitant la requête via l'agent
 def translate_query_and_response(user_input: str, agent):
-    response = agent.invoke({"input": user_input})
+    # Détecter la langue et traduire vers l'anglais
+    english_input, detected_lang = detect_and_translate_to_english(user_input)
+    
+    # Exécuter l'agent
+    response = agent.invoke({"input": english_input})
     if isinstance(response, dict):
-        return response.get("output", str(response))
-    return str(response)
+        output_text = response.get("output", str(response))
+    else:
+        output_text = str(response)
+
+    # Traduire le résultat vers la langue d'origine
+    return translate_from_english(output_text, detected_lang)
+
 
 # Extraction du nom du fichier HTML depuis un texte
 def extract_html_filename(text: str) -> str:
@@ -49,8 +60,7 @@ def display_html_file(filename: str):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
             html_content = f.read()
-        components.html(html_content, height=600, width=900)
-
+        components.html(html_content, height=600, width=800)
     else:
         st.warning(f"⚠️ Le fichier HTML `{filename}` n'existe pas.")
 
