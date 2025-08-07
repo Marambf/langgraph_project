@@ -7,7 +7,7 @@ import re
 from tools_geocode import get_city_bbox
 from tools_weather import get_weather_data
 from fire_detection import detect_fire_tool
-from flood_detection import query_flood_events_tool
+from flood_detection import query_disaster_events_tool
 from calendar import monthrange
 
 mois_map = {
@@ -306,5 +306,5 @@ def get_all_tools():
         get_weather_data,
         date_subtract,
         detect_fire_tool,
-        query_flood_events_tool
+        query_disaster_events_tool
     ]

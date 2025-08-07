@@ -1,4 +1,4 @@
-#flood_detection.py
+# disaster_detection.py
 import requests
 import pycountry
 import dateparser
@@ -9,6 +9,7 @@ import re
 from geopy.geocoders import Nominatim
 import time
 
+VALID_DISASTER_TYPES = ["flood", "storm", "earthquake"]
 
 def get_iso3_from_country_name(name):
     try:
@@ -26,10 +27,10 @@ def get_emdat_by_iso3(iso3_code):
     except Exception:
         return None
 
-def filter_floods_between_dates(events, start_date, end_date):
+def filter_disasters_between_dates(events, start_date, end_date, disaster_type="flood"):
     filtered = []
     for event in events:
-        if event.get("disastertype", "").lower() != "flood":
+        if event.get("disastertype", "").lower() != disaster_type:
             continue
         try:
             start_event = datetime(
@@ -51,8 +52,14 @@ def filter_floods_between_dates(events, start_date, end_date):
 def format_event_human_readable(event):
     start_date = f"{event.get('startday', '?')}/{event.get('startmonth', '?')}/{event.get('startyear', '?')}"
     end_date = f"{event.get('endday', '?')}/{event.get('endmonth', '?')}/{event.get('endyear', '?')}"
+    disaster_emoji = {
+        "flood": "🌊",
+        "storm": "🌪️",
+        "earthquake": "🏔️"
+    }.get(event.get("disastertype", "").lower(), "❗")
+
     return (
-        f"🌊 **Inondation en {event.get('country', '?')} ({event.get('location', 'Lieu inconnu')})**\n"
+        f"{disaster_emoji} **{event.get('disastertype', '').capitalize()} en {event.get('country', '?')} ({event.get('location', 'Lieu inconnu')})**\n"
         f"📍 Lieu : {event.get('location', 'Inconnu')}\n"
         f"📅 Du {start_date} au {end_date}\n"
         f"☠️ Décès : {event.get('totaldeaths', 'Non précisé')}\n"
@@ -61,20 +68,8 @@ def format_event_human_readable(event):
         "--------------------------------------------------"
     )
 
-from typing import Optional
-from datetime import datetime
-import dateparser
-import re
-
 def extract_dates_from_text(date_text: str) -> Optional[tuple[datetime.date, datetime.date]]:
-    """
-    Extract start_date and end_date from any natural language string.
-    Supporte les intervalles avec mots-clés (du... au..., from... to..., entre... et...)
-    ainsi que le format simple de deux dates séparées par un espace.
-    """
     date_text = date_text.strip()
-    
-    # Cas simple : deux dates séparées par un espace
     dates = date_text.split()
     if len(dates) == 2:
         start_date = dateparser.parse(dates[0], languages=["fr", "en"])
@@ -82,7 +77,6 @@ def extract_dates_from_text(date_text: str) -> Optional[tuple[datetime.date, dat
         if start_date and end_date:
             return start_date.date(), end_date.date()
 
-    # Cas avec mots-clés d'intervalle
     interval_match = re.search(
         r"(du|from|entre)?\s*(.*?)\s*(au|to|et|et le)?\s*(.*)", 
         date_text, 
@@ -96,16 +90,89 @@ def extract_dates_from_text(date_text: str) -> Optional[tuple[datetime.date, dat
         if start_date and end_date:
             return start_date.date(), end_date.date()
 
-    # Sinon, une seule date simple
     parsed = dateparser.parse(date_text, languages=["fr", "en"])
     if parsed:
         return parsed.date(), parsed.date()
     
     return None
 
+def generate_disaster_map(events, disaster_type="flood", country="Unknown", start_date=None, map_filename=None):
+    if country == "Unknown" and events:
+        country = events[0].get("country", "Unknown")
+    if not start_date and events:
+        try:
+            start_day = events[0].get("startday", 1)
+            start_month = events[0].get("startmonth", 1)
+            start_year = events[0].get("startyear", 2000)
+            start_date = datetime(start_year, start_month, start_day)
+        except:
+            start_date = None
 
-# 🔧 Main Tool Function
-def query_flood_events_natural_query(country_name: str, date_expression: str) -> str:
+    date_str = start_date.strftime("%Y-%m-%d") if isinstance(start_date, datetime) else "unknown_date"
+    clean_country = re.sub(r'\s+', '_', country.strip()) if country else "unknown"
+    safe_disaster = disaster_type.replace(" ", "_")
+    map_filename = map_filename or f"{safe_disaster}_map_{clean_country}_{date_str}.html"
+
+    map_ = folium.Map(location=[45, 10], zoom_start=4)
+    geolocator = Nominatim(user_agent="disaster_mapper")
+
+    for event in events:
+        location_name = event.get("location")
+        country_name = event.get("country", "")
+        lat = event.get("latitude")
+        lon = event.get("longitude")
+
+        start = f"{event.get('startday', '?')}/{event.get('startmonth', '?')}/{event.get('startyear', '?')}"
+        end = f"{event.get('endday', '?')}/{event.get('endmonth', '?')}/{event.get('endyear', '?')}"
+        popup_text = f"{location_name or 'Lieu inconnu'}, {country_name}<br>Du {start} au {end}"
+
+        icon_color = {
+            "flood": "blue",
+            "storm": "darkred",
+            "earthquake": "green"
+        }.get(disaster_type, "gray")
+
+        if lat and lon:
+            try:
+                folium.Marker(
+                    location=[float(lat), float(lon)],
+                    popup=popup_text,
+                    icon=folium.Icon(color=icon_color, icon='info-sign')
+                ).add_to(map_)
+                continue
+            except:
+                pass
+
+        if location_name:
+            places = [p.strip() for p in re.split(',|;', location_name) if p.strip()]
+            for place in places:
+                try:
+                    loc = geolocator.geocode(f"{place}, {country_name}", timeout=10)
+                    if loc:
+                        folium.Marker(
+                            location=[loc.latitude, loc.longitude],
+                            popup=popup_text,
+                            icon=folium.Icon(color=icon_color, icon='info-sign')
+                        ).add_to(map_)
+                        time.sleep(1)
+                        break
+                except Exception as e:
+                    print(f"Erreur géocodage pour {place}: {e}")
+                    continue
+
+    map_.save(map_filename)
+    print(f"✅ Carte générée : {map_filename} (ouvrez-la dans un navigateur)")
+    return map_filename
+
+from langchain.tools import tool
+
+@tool
+def query_disaster_events_tool(country_name: str, date_expression: str, disaster_type: str = "flood") -> str:
+    """Recherche des catastrophes naturelles (inondation, tempête, tremblement de terre) dans un pays donné et pour une date ou plage de dates."""
+    
+    if disaster_type.lower() not in VALID_DISASTER_TYPES:
+        return f"❌ Type de catastrophe non reconnu : '{disaster_type}'. Choisissez parmi {', '.join(VALID_DISASTER_TYPES)}."
+
     iso3 = get_iso3_from_country_name(country_name)
     if not iso3:
         return f"❌ Pays '{country_name}' non reconnu."
@@ -119,102 +186,15 @@ def query_flood_events_natural_query(country_name: str, date_expression: str) ->
     if not events:
         return f"❌ Aucune donnée trouvée pour le pays '{country_name}' (code {iso3})."
 
-    filtered = filter_floods_between_dates(events, start_date, end_date)
+    filtered = filter_disasters_between_dates(events, start_date, end_date, disaster_type.lower())
     if not filtered:
-        return f"✅ Aucune inondation trouvée en {country_name} entre {start_date} et {end_date}."
+        return f"✅ Aucun événement '{disaster_type}' trouvé en {country_name} entre {start_date} et {end_date}."
 
-    # Génération de la carte
-    map_file = generate_flood_map(filtered)
+    map_file = generate_disaster_map(filtered, disaster_type.lower(), country_name, start_date)
 
-    result = f"✅ Inondations trouvées en {country_name} entre {start_date} et {end_date} :\n\n"
+    result = f"✅ Événements '{disaster_type}' trouvés en {country_name} entre {start_date} et {end_date} :\n\n"
     for e in filtered:
         result += format_event_human_readable(e) + "\n"
 
-    result += f"\n🗺️ Une carte des inondations a été générée : {map_file}"
+    result += f"\n🗺️ Une carte a été générée : {map_file}"
     return result
-
-from geopy.geocoders import Nominatim
-from time import sleep
-
-def generate_flood_map(events, country="Unknown", start_date=None, map_filename=None):
-    """
-    Génère une carte Folium avec des marqueurs personnalisés.
-    """
-    from geopy.geocoders import Nominatim
-    from time import sleep
-
-    # ✅ Extraire country si non fourni
-    if country == "Unknown" and events:
-        country = events[0].get("country", "Unknown")
-
-    # ✅ Extraire start_date si non fourni
-    if not start_date and events:
-        try:
-            start_day = events[0].get("startday", 1)
-            start_month = events[0].get("startmonth", 1)
-            start_year = events[0].get("startyear", 2000)
-            start_date = datetime(start_year, start_month, start_day)
-        except:
-            start_date = None
-
-    # ✅ Format du nom de fichier
-    date_str = start_date.strftime("%Y-%m-%d") if isinstance(start_date, datetime) else "unknown_date"
-    clean_country = re.sub(r'\s+', '_', country.strip()) if country else "unknown"
-    map_filename = map_filename or f"flood_map_{clean_country}_{date_str}.html"
-
-    # 🌍 Création de la carte
-    flood_map = folium.Map(location=[45, 10], zoom_start=4)
-    geolocator = Nominatim(user_agent="flood_mapper")
-
-    for event in events:
-        location_name = event.get("location")
-        country_name = event.get("country", "")
-        lat = event.get("latitude")
-        lon = event.get("longitude")
-
-        start = f"{event.get('startday', '?')}/{event.get('startmonth', '?')}/{event.get('startyear', '?')}"
-        end = f"{event.get('endday', '?')}/{event.get('endmonth', '?')}/{event.get('endyear', '?')}"
-        popup_text = f"{location_name or 'Lieu inconnu'}, {country_name}<br>Du {start} au {end}"
-
-        # 🔵 Ajout avec coordonnées directes
-        if lat and lon:
-            try:
-                folium.Marker(
-                    location=[float(lat), float(lon)],
-                    popup=popup_text,
-                    icon=folium.Icon(color='darkblue', icon='tint', prefix='fa')
-                ).add_to(flood_map)
-                continue
-            except:
-                pass
-
-        # 📍 Géocodage si lat/lon manquants
-        if location_name:
-            places = [p.strip() for p in re.split(',|;', location_name) if p.strip()]
-            for place in places:
-                try:
-                    loc = geolocator.geocode(f"{place}, {country_name}", timeout=10)
-                    if loc:
-                        folium.Marker(
-                            location=[loc.latitude, loc.longitude],
-                            popup=popup_text,
-                            icon=folium.Icon(color='darkblue', icon='tint', prefix='fa')
-                        ).add_to(flood_map)
-                        sleep(1)
-                        break
-                except Exception as e:
-                    print(f"Erreur géocodage pour {place}: {e}")
-                    continue
-
-    flood_map.save(map_filename)
-    print(f"✅ Carte générée : {map_filename} (ouvrez-la dans un navigateur)")
-    return map_filename
-
-
-
-from langchain.tools import tool
-
-@tool
-def query_flood_events_tool(country_name: str, date_expression: str) -> str:
-    """Recherche des inondations dans un pays donné et pour une date ou plage de dates en langage naturel."""
-    return query_flood_events_natural_query(country_name, date_expression)

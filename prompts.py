@@ -144,8 +144,8 @@ examples = [
 {
     "question": "Montre-moi les inondations en France le 3 juin 2023",
     "response": (
-        "Action: detect_flood_tool(location='France', target_date='2023-06-03')\n"
-        "Observation: Inondations détectées à France entre 2023-06-03 et 2023-06-03 :\n"
+        "Action: query_disaster_events_tool(country_name='France', date_expression='3 juin 2023', disaster_type='flood')\n"
+        "Observation: Inondations détectées en France entre 2023-06-03 et 2023-06-03 :\n"
         "- Flood in Paris (2023-06-03 ➝ 2023-06-03)\n"
         "Final Answer: Une inondation a été détectée à Paris le 3 juin 2023."
     )
@@ -153,7 +153,7 @@ examples = [
 {
     "question": "Show me the floods in Italy on May 10, 2022",
     "response": (
-        "Action: detect_flood_tool(location='Italy', target_date='2022-05-10')\n"
+        "Action: query_disaster_events_tool(country_name='Italy', date_expression='May 10, 2022', disaster_type='flood')\n"
         "Observation: Floods detected in Italy between 2022-05-10 and 2022-05-10:\n"
         "- Flood in Venice (2022-05-10 ➝ 2022-05-10)\n"
         "Final Answer: A flood was detected in Venice on May 10, 2022."
@@ -162,11 +162,29 @@ examples = [
 {
     "question": "Quelles sont les inondations survenues en Allemagne entre janvier et mars 2023 ?",
     "response": (
-        "Action: detect_flood_tool(location='Allemagne', start_date='2023-01-01', end_date='2023-03-31')\n"
+        "Action: query_disaster_events_tool(country_name='Allemagne', date_expression='entre janvier et mars 2023', disaster_type='flood')\n"
         "Observation: Inondations détectées en Allemagne entre 2023-01-01 et 2023-03-31 :\n"
         "- Flood in Berlin (2023-01-15 ➝ 2023-01-17)\n"
         "- Flood in Hamburg (2023-03-02 ➝ 2023-03-03)\n"
         "Final Answer: Deux inondations ont été détectées en Allemagne entre janvier et mars 2023 : à Berlin et à Hambourg."
+    )
+},
+{
+    "question": "Were there any storms in the Philippines in July 2021?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Philippines', date_expression='July 2021', disaster_type='storm')\n"
+        "Observation: Storms detected in Philippines between 2021-07-01 and 2021-07-31:\n"
+        "- Storm in Luzon (2021-07-08 ➝ 2021-07-10)\n"
+        "Final Answer: A storm was detected in Luzon in July 2021."
+    )
+},
+{
+    "question": "Were there any earthquakes in Peru in March 2022?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Peru', date_expression='March 2022', disaster_type='earthquake')\n"
+        "Observation: Earthquakes detected in Peru between 2022-03-01 and 2022-03-31:\n"
+        "- Earthquake in Lima (2022-03-14 ➝ 2022-03-16)\n"
+        "Final Answer: An earthquake was detected in Lima in March 2022."
     )
 }
 
