@@ -8,9 +8,6 @@ from tools_geocode import get_city_bbox
 from tools_weather import get_weather_data
 from fire_detection import detect_fire_tool
 from flood_detection import query_flood_events_tool
-
-import re
-from datetime import datetime
 from calendar import monthrange
 
 mois_map = {
@@ -88,14 +85,22 @@ def extract_dates_from_text(text: str):
 
 
 @tool
-def get_date() -> str:
-    """Renvoie SEULEMENT la date sans commentaires"""
-    return date.today().strftime("%d/%m/%Y")
-
-@tool 
 def get_time() -> str:
-    """Renvoie SEULEMENT l'heure sans commentaires""" 
-    return datetime.now().strftime("%Hh%M")
+    """
+    Get the current time in a human-readable string format.
+    """
+    current_time = datetime.now().strftime("%Hh%M")
+    # Return a final answer sentence instead of just the raw time string
+    return f"The current time is {current_time}."
+
+@tool
+def get_date() -> str:
+    """
+    Get the current date in a human-readable string format.
+    """
+    current_date = date.today().strftime("%d/%m/%Y")
+    return f"Today's date is {current_date}."
+
 
 @tool
 def calculator(expression: str) -> str:

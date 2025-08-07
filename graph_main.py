@@ -2,6 +2,8 @@
 from langgraph.graph import StateGraph
 from nodes import create_agent_executor
 from state_schema import MyStateSchema
+from translate import detect_language, translate_to_english, translate_from_english
+
 
 graph_builder = StateGraph(state_schema=MyStateSchema)
 
@@ -33,11 +35,16 @@ def format_output(result):
 
 if __name__ == "__main__":
     print("🌍 Agent prêt, pose ta question (exit pour quitter)")
+
     while True:
         query = input("🧑 Toi : ")
         if query.lower() in ["exit", "quit", "q"]:
-            print("👋 Bye")
             break
-        result = app.invoke({"input": query})
-        print(f"✅ Réponse : {format_output(result)}")  # <-- ici, on applique format_output
+        lang = detect_language(query)
+        translated_input = translate_to_english(query)
+        result = app.invoke({"input": translated_input})
+        output = format_output(result)
+        translated_output = translate_from_english(output, lang)
+        print(f"✅ Réponse : {translated_output}")
+
 

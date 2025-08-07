@@ -1,5 +1,5 @@
 import streamlit as st
-from nodes import run_query_direct, create_agent_executor
+from nodes import run_query_direct, create_agent_executor,translate_query_and_response
 from PIL import Image
 
 agent_executor = create_agent_executor()
@@ -23,7 +23,9 @@ if st.button("🔍 Rechercher") and user_input:
             if is_satellite_query(user_input):
                 result = run_query_direct(user_input)
             else:
-                response = agent_executor.invoke({"input": user_input})
+                response = translate_query_and_response(user_input, agent_executor, translate)
+                result = response["output"]
+
                 if "output" in response:
                     result = response["output"]
                 else:
