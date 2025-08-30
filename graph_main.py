@@ -46,5 +46,3 @@ if __name__ == "__main__":
         output = format_output(result)
         translated_output = translate_from_english(output, lang)
         print(f"✅ Réponse : {translated_output}")
-
-

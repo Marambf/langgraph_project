@@ -1,3 +1,4 @@
+
 #prompts.py
 """
 prompts.py - Contains all prompt templates and examples for the satellite imagery assistant
@@ -186,9 +187,47 @@ examples = [
         "- Earthquake in Lima (2022-03-14 ➝ 2022-03-16)\n"
         "Final Answer: An earthquake was detected in Lima in March 2022."
     )
-}
-
-
+},
+    
+{
+        "question": "Évalue le risque d’infiltration d’eau de surface à Paris",
+        "response": (
+            "Action: estimate_surface_water_ingress_tool(location_input='Paris')\n"
+            "Observation: \n"
+            "  Ingress_paths_estimate: L’eau suit les lignes d’écoulement (D8) vers les points bas.\n"
+            "  Mitigation_actions: Créer des rigoles ou bermes, Installer un drain français, Nettoyer les grilles, Vérifier étanchéité\n"
+            "  Statistics: DEM_shape=(200,200), Elevation_min=28.5, Elevation_max=112.3, Elevation_mean=57.2, Slope_mean=0.018, Risk_zone_percent=12.7\n"
+            "  Maps: Elevation=map_elevation.png, Slope=map_slope.png, FlowAccumulation=map_flowacc.png, Risk=map_risk.png, Risk_Folium=map_risk_folium.html\n"
+            "  Explanation: 📊 Comment lire les cartes ...\n"
+            "Final Answer: Voici l’évaluation du risque d’infiltration d’eau de surface à Paris, avec statistiques, actions de mitigation et cartes générées."
+        )
+    },
+    {
+        "question": "Estimate surface water ingress risk for New York City",
+        "response": (
+            "Action: estimate_surface_water_ingress_tool(location_input='New York City')\n"
+            "Observation: \n"
+            "  Ingress_paths_estimate: Water follows D8 flow lines towards low points.\n"
+            "  Mitigation_actions: Create channels or berms to divert water upstream, Install French drains along flow lines, Regularly clean grates and inlets, Check waterproofing of thresholds and joints\n"
+            "  Statistics: DEM_shape=(210,210), Elevation_min=2.5, Elevation_max=41.3, Elevation_mean=14.7, Slope_mean=0.022, Risk_zone_percent=18.4\n"
+            "  Maps: Elevation=map_elevation.png, Slope=map_slope.png, FlowAccumulation=map_flowacc.png, Risk=map_risk.png, Risk_Folium=map_risk_folium.html\n"
+            "  Explanation: 📊 How to read the maps: 1. Elevation map: darker = lower areas. 2. Slope map: steeper slopes = faster runoff. 3. Flow accumulation: likely water paths. 4. Risk map: red zones = potential water accumulation.\n"
+            "Final Answer: Here is the surface water ingress risk assessment for New York City, including statistics, mitigation actions, and generated maps."
+        )
+    },
+    {
+        "question": "Can you provide a detailed surface water risk analysis for New York City?",
+        "response": (
+            "Action: estimate_surface_water_ingress_tool(location_input='New York City')\n"
+            "Observation: \n"
+            "  Ingress_paths_estimate: Water follows D8 flow lines towards low points.\n"
+            "  Mitigation_actions: Create channels or berms to divert water upstream, Install French drains along flow lines, Regularly clean grates and inlets, Check waterproofing of thresholds and joints\n"
+            "  Statistics: DEM_shape=(210,210), Elevation_min=2.5, Elevation_max=41.3, Elevation_mean=14.7, Slope_mean=0.022, Risk_zone_percent=18.4\n"
+            "  Maps: Elevation=map_elevation.png, Slope=map_slope.png, FlowAccumulation=map_flowacc.png, Risk=map_risk.png, Risk_Folium=map_risk_folium.html\n"
+            "  Explanation: 📊 How to read the maps: 1. Elevation map: darker = lower areas. 2. Slope map: steeper slopes = faster runoff. 3. Flow accumulation: likely water paths. 4. Risk map: red zones = potential water accumulation.\n"
+            "Final Answer: Here is the surface water ingress risk assessment for New York City, including statistics, mitigation actions, and generated maps."
+        )
+    }
 
 ]
 

@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_0da0f7dfc922a288c957da9bdd47505a {
+                #map_0fbbfd160eaee3ea5fa7cf1a7691d650 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,19 +54,19 @@
 <body>
     
     
-            <div class="folium-map" id="map_0da0f7dfc922a288c957da9bdd47505a" ></div>
+            <div class="folium-map" id="map_0fbbfd160eaee3ea5fa7cf1a7691d650" ></div>
         
 </body>
 <script>
     
     
-            var map_0da0f7dfc922a288c957da9bdd47505a = L.map(
-                "map_0da0f7dfc922a288c957da9bdd47505a",
+            var map_0fbbfd160eaee3ea5fa7cf1a7691d650 = L.map(
+                "map_0fbbfd160eaee3ea5fa7cf1a7691d650",
                 {
-                    center: [45.0, 10.0],
+                    center: [48.5958681, 2.5798953],
                     crs: L.CRS.EPSG3857,
                     ...{
-  "zoom": 4,
+  "zoom": 7,
   "zoomControl": true,
   "preferCanvas": false,
 }
@@ -78,7 +78,7 @@
 
         
     
-            var tile_layer_3b61b5c29322ea616645352f9c6c76ba = L.tileLayer(
+            var tile_layer_857f31bdf5cc06a788dd887f6a844b6e = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -95,45 +95,30 @@
             );
         
     
-            tile_layer_3b61b5c29322ea616645352f9c6c76ba.addTo(map_0da0f7dfc922a288c957da9bdd47505a);
+            tile_layer_857f31bdf5cc06a788dd887f6a844b6e.addTo(map_0fbbfd160eaee3ea5fa7cf1a7691d650);
         
     
-            var marker_de9b757fb09b018d9e4b656e93ea9fb7 = L.marker(
-                [8.4327951, 99.9627967],
-                {
-}
-            ).addTo(map_0da0f7dfc922a288c957da9bdd47505a);
+            var circle_marker_21fd719b8f3c966f92372e0078ccd466 = L.circleMarker(
+                [48.94805, 2.73721],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_0fbbfd160eaee3ea5fa7cf1a7691d650);
         
     
-            var icon_d5d43e0936ac77cb7092b11b9ff0d8c7 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "darkred",
-  "iconColor": "white",
-  "icon": "info-sign",
-  "prefix": "glyphicon",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_9e82bcd1c7d34fa1cb9da8d13aa749b5 = L.popup({
+        var popup_304744e623e985add6179f5d2678082f = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_b529d9150eb29bd531797a69099c0133 = $(`<div id="html_b529d9150eb29bd531797a69099c0133" style="width: 100.0%; height: 100.0%;">Nakhon Si Thammarat, Krabi, and Surat Thani., Thailand<br>Du 20/7/2025 au 20/7/2025</div>`)[0];
-                popup_9e82bcd1c7d34fa1cb9da8d13aa749b5.setContent(html_b529d9150eb29bd531797a69099c0133);
+                var html_c924c56332164c5a033e670845505bc7 = $(`<div id="html_c924c56332164c5a033e670845505bc7" style="width: 100.0%; height: 100.0%;">Brightness: 301.19, Date: 2025-08-07, Time: 202</div>`)[0];
+                popup_304744e623e985add6179f5d2678082f.setContent(html_c924c56332164c5a033e670845505bc7);
             
         
 
-        marker_de9b757fb09b018d9e4b656e93ea9fb7.bindPopup(popup_9e82bcd1c7d34fa1cb9da8d13aa749b5)
+        circle_marker_21fd719b8f3c966f92372e0078ccd466.bindPopup(popup_304744e623e985add6179f5d2678082f)
         ;
 
         
     
-    
-                marker_de9b757fb09b018d9e4b656e93ea9fb7.setIcon(icon_d5d43e0936ac77cb7092b11b9ff0d8c7);
-            
 </script>
 </html>

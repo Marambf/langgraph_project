@@ -1,5 +1,5 @@
 import streamlit as st
-from nodes import run_query_direct, create_agent_executor,translate_query_and_response
+from nodes import run_query_direct, create_agent_executor
 from PIL import Image
 
 agent_executor = create_agent_executor()
@@ -50,4 +50,3 @@ if st.button("🔍 Rechercher") and user_input:
 
         except Exception as e:
             st.error(f"❌ Erreur : {str(e)}")
-
