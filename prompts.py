@@ -227,7 +227,247 @@ examples = [
             "  Explanation: 📊 How to read the maps: 1. Elevation map: darker = lower areas. 2. Slope map: steeper slopes = faster runoff. 3. Flow accumulation: likely water paths. 4. Risk map: red zones = potential water accumulation.\n"
             "Final Answer: Here is the surface water ingress risk assessment for New York City, including statistics, mitigation actions, and generated maps."
         )
-    }
+    },
+    {
+    "question": "Montre-moi les risques naturels à Paris",
+    "response": (
+        "Action: think_hazard('Paris')\n"
+        "Observation: Top 5 hazards for this location (Paris, Île-de-France, France):\n"
+        "- River flood: High\n"
+        "- Wildfire: Medium\n"
+        "- Urban flood: Medium\n"
+        "- Water scarcity: Low\n"
+        "- Extreme heat: Medium\n"
+        "--------------------------------------------------\n"
+        "Final Answer: Voici les principaux risques naturels à Paris avec leurs niveaux de gravité."
+    )
+},
+{
+    "question": "Show me the top hazards in New York City",
+    "response": (
+        "Action: think_hazard('New York City')\n"
+        "Observation: Top 5 hazards for this location (New York, NY, USA):\n"
+        "- Urban flood: High\n"
+        "- Extreme heat: Medium\n"
+        "- River flood: Medium\n"
+        "- Wildfire: Low\n"
+        "- Water scarcity: Low\n"
+        "--------------------------------------------------\n"
+        "Final Answer: Here are the top natural hazards in New York City with their severity levels."
+    )
+},
+{
+    "question": "Évalue les dangers naturels pour les coordonnées 48.8566, 2.3522",
+    "response": (
+        "Action: think_hazard('48.8566, 2.3522')\n"
+        "Observation: Top 5 hazards for this location (Paris, Île-de-France, France):\n"
+        "- River flood: High\n"
+        "- Urban flood: Medium\n"
+        "- Extreme heat: Medium\n"
+        "- Wildfire: Low\n"
+        "- Water scarcity: Low\n"
+        "--------------------------------------------------\n"
+        "Final Answer: Voici les principaux risques naturels pour la localisation donnée avec leurs niveaux."
+    )
+},
+{
+    "question": "Give me the hazard assessment for Tokyo",
+    "response": (
+        "Action: think_hazard('Tokyo')\n"
+        "Observation: Top 5 hazards for this location (Tokyo, Japan):\n"
+        "- Earthquake: High\n"
+        "- Urban flood: Medium\n"
+        "- Extreme heat: Medium\n"
+        "- River flood: Low\n"
+        "- Wildfire: Low\n"
+        "--------------------------------------------------\n"
+        "Final Answer: Here are the main natural hazards in Tokyo with their risk levels."
+    )
+},
+{
+    "question": "Y a-t-il eu des températures extrêmes à Paris en juillet 2023 ?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='France', date_expression='juillet 2023', disaster_type='extreme temperature')\n"
+        "Observation: Températures extrêmes détectées en France entre 2023-07-01 et 2023-07-31 :\n"
+        "- Extreme temperature in Paris (2023-07-12 ➝ 2023-07-14)\n"
+        "Final Answer: Des températures extrêmes ont été enregistrées à Paris entre le 12 et le 14 juillet 2023."
+    )
+},
+{
+    "question": "Were there any droughts in Spain in summer 2022?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Spain', date_expression='summer 2022', disaster_type='drought')\n"
+        "Observation: Droughts detected in Spain between 2022-06-01 and 2022-08-31:\n"
+        "- Drought in Valencia (2022-06-15 ➝ 2022-08-20)\n"
+        "Final Answer: A drought was recorded in Valencia during summer 2022."
+    )
+},
+{
+    "question": "Accidents industriels récents autour de Lyon ?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='France', date_expression='2025-07-15', disaster_type='industrial accident')\n"
+        "Observation: 2 accidents industriels détectés autour de Lyon le 15 juillet 2025.\n"
+        "Final Answer: Deux accidents industriels ont été détectés autour de Lyon le 15 juillet 2025."
+    )
+},
+{
+    "question": "Were there any transport accidents in New York City in March 2024?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='USA', date_expression='March 2024', disaster_type='transport')\n"
+        "Observation: Transport accidents detected in New York City between 2024-03-01 and 2024-03-31:\n"
+        "- Transport accident in Manhattan (2024-03-10)\n"
+        "- Transport accident in Brooklyn (2024-03-22)\n"
+        "Final Answer: Two transport accidents occurred in New York City in March 2024: one in Manhattan on March 10 and one in Brooklyn on March 22."
+    )
+},
+{
+    "question": "Donne-moi des informations sur la France",
+    "response": (
+        "Action: geo_info_tool(name='France')\n"
+        "Observation: Type : Pays\nNom : France\nCapital : Paris\nPopulation : 67391582\nSuperficie (km²) : 551695\nRégion : Europe\nSous-région : Western Europe\nLangues : ['French']\nMonnaie : Euro\nDrapeau : https://flagcdn.com/w320/fr.png\n"
+        "Final Answer: La France est un pays d'Europe dont la capitale est Paris. Elle compte environ 67 millions d'habitants et une superficie de 551 695 km²."
+    )
+},
+{
+    "question": "What can you tell me about Japan?",
+    "response": (
+        "Action: geo_info_tool(name='Japan')\n"
+        "Observation: Type : Pays\nNom : Japan\nCapital : Tokyo\nPopulation : 125836021\nSuperficie (km²) : 377930\nRégion : Asia\nSous-région : Eastern Asia\nLangues : ['Japanese']\nMonnaie : Yen\nDrapeau : https://flagcdn.com/w320/jp.png\n"
+        "Final Answer: Japan is an Asian country located in Eastern Asia. Its capital is Tokyo and it has a population of about 125 million."
+    )
+},
+{
+    "question": "Informations sur Casablanca",
+    "response": (
+        "Action: geo_info_tool(name='Casablanca')\n"
+        "Observation: Type : Ville\nNom : Casablanca, Préfecture de Casablanca, Maroc\nPays : Morocco\nRégion : Casablanca-Settat\nLatitude : 33.58831\nLongitude : -7.61138\nPopulation : 3359818\n"
+        "Final Answer: Casablanca est une ville marocaine située dans la région de Casablanca-Settat. Elle compte environ 3,3 millions d'habitants."
+    )
+},
+{
+    "question": "Tell me about New York",
+    "response": (
+        "Action: geo_info_tool(name='New York')\n"
+        "Observation: Type : Ville\nNom : New York, New York County, New York, United States\nPays : United States\nRégion : New York\nLatitude : 40.7127281\nLongitude : -74.0060152\nPopulation : 8804190\n"
+        "Final Answer: New York is a city in the United States, located in the state of New York. It has a population of about 8.8 million people."
+    )
+},
+{
+    "question": "Peux-tu me donner des infos sur l'Allemagne ?",
+    "response": (
+        "Action: geo_info_tool(name='Allemagne')\n"
+        "Observation: Type : Pays\nNom : Germany\nCapital : Berlin\nPopulation : 83166711\nSuperficie (km²) : 357114\nRégion : Europe\nSous-région : Western Europe\nLangues : ['German']\nMonnaie : Euro\nDrapeau : https://flagcdn.com/w320/de.png\n"
+        "Final Answer: L'Allemagne est un pays d'Europe centrale dont la capitale est Berlin. Sa population est d'environ 83 millions d'habitants."
+    )
+},
+{
+    "question": "Donne-moi l'itinéraire de Paris à Lyon",
+    "response": (
+        "Action: route_tool(start='Paris', end='Lyon')\n"
+        "Observation: Distance totale : 463.2 km\nDurée estimée : 4 h 28 min\nÉtapes :\n"
+        " 1. Départ sur Paris.\n"
+        " 2. Prenez la bretelle légèrement à droite sur A6 (2.1 km).\n"
+        " 3. Continuez tout droit sur A6 (120 km).\n"
+        " ...\n"
+        "Final Answer: L’itinéraire de Paris à Lyon fait environ 463 km et dure 4 h 28 min. La carte a été enregistrée dans le fichier `itineraire.html`."
+    )
+},
+{
+    "question": "Peux-tu me calculer la route entre Casablanca et Rabat ?",
+    "response": (
+        "Action: route_tool(start='Casablanca', end='Rabat')\n"
+        "Observation: Distance totale : 87.4 km\nDurée estimée : 1 h 05 min\nÉtapes :\n"
+        " 1. Départ sur Casablanca.\n"
+        " 2. Prenez la bretelle à droite sur A1 (12 km).\n"
+        " 3. Continuez tout droit sur A1 (75 km).\n"
+        "Final Answer: L’itinéraire de Casablanca à Rabat dure environ 1 h 05 min pour 87 km. Une carte a été générée (`itineraire.html`)."
+    )
+},
+{
+    "question": "How do I go from New York to Boston?",
+    "response": (
+        "Action: route_tool(start='New York', end='Boston')\n"
+        "Observation: Distance: 346.5 km\nEstimated duration: 3 h 45 min\nSteps:\n"
+        " 1. Start in New York.\n"
+        " 2. Take the ramp right onto I-95 North (15 km).\n"
+        " 3. Continue on I-95 for 320 km.\n"
+        "Final Answer: The trip from New York to Boston is about 346 km and takes around 3 h 45 min. The map has been saved in `itineraire.html`."
+    )
+},
+{
+    "question": "Itinéraire de Marseille à Nice",
+    "response": (
+        "Action: route_tool(start='Marseille', end='Nice')\n"
+        "Observation: Distance totale : 200.7 km\nDurée estimée : 2 h 20 min\nÉtapes :\n"
+        " 1. Départ sur Marseille.\n"
+        " 2. Prenez la sortie vers A50.\n"
+        " 3. Continuez sur A8 direction Nice.\n"
+        "Final Answer: Le trajet Marseille → Nice fait environ 200 km et prend 2 h 20 min. Une carte interactive est disponible (`itineraire.html`)."
+    )
+},
+{
+    "question": "Peux-tu me donner la météo actuelle et les prévisions pour Paris ?",
+    "response": (
+        "Action: weather_tool(city_name='Paris')\n"
+        "Observation: Météo actuelle à Paris : 18°C, vent 12 km/h.\n"
+        "Prévisions :\n"
+        "2025-08-31 : Max 22°C / Min 16°C / Pluie 0 mm\n"
+        "2025-09-01 : Max 24°C / Min 17°C / Pluie 1 mm\n"
+        "2025-09-02 : Max 21°C / Min 15°C / Pluie 0 mm\n"
+        "Final Answer: À Paris, la température actuelle est de 18°C avec un vent de 12 km/h. Les prochains jours verront des températures comprises entre 15 et 24°C avec peu de pluie."
+    )
+},
+{
+    "question": "What is the weather like in Tokyo?",
+    "response": (
+        "Action: weather_tool(city_name='Tokyo')\n"
+        "Observation: Current weather in Tokyo: 27°C, wind 8 km/h.\n"
+        "Forecast:\n"
+        "2025-08-31 : Max 30°C / Min 24°C / Rain 0 mm\n"
+        "2025-09-01 : Max 31°C / Min 25°C / Rain 2 mm\n"
+        "2025-09-02 : Max 29°C / Min 23°C / Rain 0 mm\n"
+        "Final Answer: In Tokyo, the current temperature is 27°C with wind at 8 km/h. The next few days will range from 23 to 31°C with occasional rain."
+    )
+},
+{
+    "question": "Donne-moi la météo à Casablanca",
+    "response": (
+        "Action: weather_tool(city_name='Casablanca')\n"
+        "Observation: Météo actuelle à Casablanca : 26°C, vent 15 km/h.\n"
+        "Prévisions :\n"
+        "2025-08-31 : Max 29°C / Min 21°C / Pluie 0 mm\n"
+        "2025-09-01 : Max 30°C / Min 22°C / Pluie 0 mm\n"
+        "2025-09-02 : Max 28°C / Min 21°C / Pluie 0 mm\n"
+        "Final Answer: À Casablanca, il fait actuellement 26°C avec un vent de 15 km/h. Les températures prévues oscillent entre 21 et 30°C avec pas de pluie."
+    )
+},
+{
+    "question": "What's the weather forecast for New York?",
+    "response": (
+        "Action: weather_tool(city_name='New York')\n"
+        "Observation: Current weather in New York: 23°C, wind 10 km/h.\n"
+        "Forecast:\n"
+        "2025-08-31 : Max 26°C / Min 20°C / Rain 1 mm\n"
+        "2025-09-01 : Max 25°C / Min 19°C / Rain 0 mm\n"
+        "2025-09-02 : Max 24°C / Min 18°C / Rain 2 mm\n"
+        "Final Answer: In New York, the current temperature is 23°C with a 10 km/h wind. The upcoming days will see temperatures from 18 to 26°C with light rain."
+    )
+},
+{
+    "question": "Peux-tu me donner la météo pour Berlin ?",
+    "response": (
+        "Action: weather_tool(city_name='Berlin')\n"
+        "Observation: Météo actuelle à Berlin : 20°C, vent 9 km/h.\n"
+        "Prévisions :\n"
+        "2025-08-31 : Max 23°C / Min 16°C / Pluie 0 mm\n"
+        "2025-09-01 : Max 22°C / Min 15°C / Pluie 0 mm\n"
+        "2025-09-02 : Max 21°C / Min 14°C / Pluie 1 mm\n"
+        "Final Answer: À Berlin, la température actuelle est de 20°C avec un vent de 9 km/h. Les prochains jours seront compris entre 14 et 23°C avec très peu de pluie."
+    )
+}
+
+
+
 
 ]
 

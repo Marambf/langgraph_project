@@ -10,7 +10,10 @@ from fire_detection import detect_fire_tool
 from flood_detection import query_disaster_events_tool
 from water_ingress import estimate_surface_water_ingress_tool
 from calendar import monthrange
-
+from think_hazard import think_hazard
+from geographic_info import geo_info_tool   
+from itinerary import get_route_info
+from weather import weather_tool
 mois_map = {
     "janvier": "01", "février": "02", "mars": "03", "avril": "04",
     "mai": "05", "juin": "06", "juillet": "07", "août": "08",
@@ -308,5 +311,9 @@ def get_all_tools():
         date_subtract,
         detect_fire_tool,
         query_disaster_events_tool,
-        estimate_surface_water_ingress_tool
+        estimate_surface_water_ingress_tool,
+        think_hazard,
+        geo_info_tool,
+        get_route_info,
+        weather_tool
     ]

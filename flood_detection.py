@@ -167,9 +167,16 @@ def generate_disaster_map(events, disaster_type="flood", country="Unknown", star
 from langchain.tools import tool
 
 @tool
-def query_disaster_events_tool(country_name: str, date_expression: str, disaster_type: str = "flood") -> str:
-    """Recherche des catastrophes naturelles (inondation, tempête, tremblement de terre) dans un pays donné et pour une date ou plage de dates."""
-    
+def query_disaster_events_tool(params: str) -> str:
+    """
+    Recherche des catastrophes naturelles (inondation, tempête, tremblement de terre) dans un pays donné et pour une date ou plage de dates.
+    Format attendu : 'country_name=Romania date_expression=2025-07-28 disaster_type=flood'
+    """
+    args = dict(x.split('=') for x in params.split() if '=' in x)
+    country_name = args.get('country_name', '')
+    date_expression = args.get('date_expression', '')
+    disaster_type = args.get('disaster_type', 'flood')
+
     if disaster_type.lower() not in VALID_DISASTER_TYPES:
         return f"❌ Type de catastrophe non reconnu : '{disaster_type}'. Choisissez parmi {', '.join(VALID_DISASTER_TYPES)}."
 
@@ -197,4 +204,4 @@ def query_disaster_events_tool(country_name: str, date_expression: str, disaster
         result += format_event_human_readable(e) + "\n"
 
     result += f"\n🗺️ Une carte a été générée : {map_file}"
-    return result
+    return f"Final Answer: {result}"
