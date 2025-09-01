@@ -1,4 +1,3 @@
-
 #prompts.py
 """
 prompts.py - Contains all prompt templates and examples for the satellite imagery assistant
@@ -358,18 +357,6 @@ examples = [
         "Action: geo_info_tool(name='Allemagne')\n"
         "Observation: Type : Pays\nNom : Germany\nCapital : Berlin\nPopulation : 83166711\nSuperficie (km²) : 357114\nRégion : Europe\nSous-région : Western Europe\nLangues : ['German']\nMonnaie : Euro\nDrapeau : https://flagcdn.com/w320/de.png\n"
         "Final Answer: L'Allemagne est un pays d'Europe centrale dont la capitale est Berlin. Sa population est d'environ 83 millions d'habitants."
-    )
-},
-{
-    "question": "Donne-moi l'itinéraire de Paris à Lyon",
-    "response": (
-        "Action: route_tool(start='Paris', end='Lyon')\n"
-        "Observation: Distance totale : 463.2 km\nDurée estimée : 4 h 28 min\nÉtapes :\n"
-        " 1. Départ sur Paris.\n"
-        " 2. Prenez la bretelle légèrement à droite sur A6 (2.1 km).\n"
-        " 3. Continuez tout droit sur A6 (120 km).\n"
-        " ...\n"
-        "Final Answer: L’itinéraire de Paris à Lyon fait environ 463 km et dure 4 h 28 min. La carte a été enregistrée dans le fichier `itineraire.html`."
     )
 },
 {

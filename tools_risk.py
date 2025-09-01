@@ -12,7 +12,7 @@ from water_ingress import estimate_surface_water_ingress_tool
 from calendar import monthrange
 from think_hazard import think_hazard
 from geographic_info import geo_info_tool   
-from itinerary import get_route_info
+#from itinerary import get_route_info
 from weather import weather_tool
 mois_map = {
     "janvier": "01", "février": "02", "mars": "03", "avril": "04",
@@ -314,6 +314,6 @@ def get_all_tools():
         estimate_surface_water_ingress_tool,
         think_hazard,
         geo_info_tool,
-        get_route_info,
+        #get_route_info,
         weather_tool
     ]

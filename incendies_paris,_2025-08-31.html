@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_a3568ef11bf953ae60c105cd0fc43e0b {
+                #map_9cecf68a9b4b5e4399907c3b669afa4c {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,19 +54,19 @@
 <body>
     
     
-            <div class="folium-map" id="map_a3568ef11bf953ae60c105cd0fc43e0b" ></div>
+            <div class="folium-map" id="map_9cecf68a9b4b5e4399907c3b669afa4c" ></div>
         
 </body>
 <script>
     
     
-            var map_a3568ef11bf953ae60c105cd0fc43e0b = L.map(
-                "map_a3568ef11bf953ae60c105cd0fc43e0b",
+            var map_9cecf68a9b4b5e4399907c3b669afa4c = L.map(
+                "map_9cecf68a9b4b5e4399907c3b669afa4c",
                 {
-                    center: [45.0, 10.0],
+                    center: [48.8588897, 2.320041],
                     crs: L.CRS.EPSG3857,
                     ...{
-  "zoom": 4,
+  "zoom": 7,
   "zoomControl": true,
   "preferCanvas": false,
 }
@@ -78,7 +78,7 @@
 
         
     
-            var tile_layer_b7f61f1042562d09f18b6dc2d795b647 = L.tileLayer(
+            var tile_layer_02bb79ffde4d1b4341fb800189baecb0 = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -95,45 +95,53 @@
             );
         
     
-            tile_layer_b7f61f1042562d09f18b6dc2d795b647.addTo(map_a3568ef11bf953ae60c105cd0fc43e0b);
+            tile_layer_02bb79ffde4d1b4341fb800189baecb0.addTo(map_9cecf68a9b4b5e4399907c3b669afa4c);
         
     
-            var marker_cce61b4bfeecbf19d7ab653e21da9759 = L.marker(
-                [47.5326534, 25.8345939],
-                {
-}
-            ).addTo(map_a3568ef11bf953ae60c105cd0fc43e0b);
+            var circle_marker_4a4ae2a8786e5e240b123f9901b3640b = L.circleMarker(
+                [48.98336, 1.76042],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_9cecf68a9b4b5e4399907c3b669afa4c);
         
     
-            var icon_dfb79015f650f9dd090465931d7476b9 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "info-sign",
-  "prefix": "glyphicon",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_2113a932c972e648ffc9ab1523dfc8b1 = L.popup({
+        var popup_9067ef5f3cb554da5ae8e06a617d8d9f = L.popup({
   "maxWidth": "100%",
 });
 
         
             
-                var html_2d1ed15528a043218f451cdf76db5302 = $(`<div id="html_2d1ed15528a043218f451cdf76db5302" style="width: 100.0%; height: 100.0%;">Suceava, Neamt counties, Romania<br>Du 28/7/2025 au 28/7/2025</div>`)[0];
-                popup_2113a932c972e648ffc9ab1523dfc8b1.setContent(html_2d1ed15528a043218f451cdf76db5302);
+                var html_7bcb3df99b3c52a06b8c620eff210bf2 = $(`<div id="html_7bcb3df99b3c52a06b8c620eff210bf2" style="width: 100.0%; height: 100.0%;">Brightness: 301.77, Date: 2025-08-31, Time: 251</div>`)[0];
+                popup_9067ef5f3cb554da5ae8e06a617d8d9f.setContent(html_7bcb3df99b3c52a06b8c620eff210bf2);
             
         
 
-        marker_cce61b4bfeecbf19d7ab653e21da9759.bindPopup(popup_2113a932c972e648ffc9ab1523dfc8b1)
+        circle_marker_4a4ae2a8786e5e240b123f9901b3640b.bindPopup(popup_9067ef5f3cb554da5ae8e06a617d8d9f)
         ;
 
         
     
     
-                marker_cce61b4bfeecbf19d7ab653e21da9759.setIcon(icon_dfb79015f650f9dd090465931d7476b9);
+            var circle_marker_6516c73c3848c1538db95f7b3fd690af = L.circleMarker(
+                [48.98526, 1.75965],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_9cecf68a9b4b5e4399907c3b669afa4c);
+        
+    
+        var popup_a7f50021c6ac14e3996f60519719995b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
             
+                var html_4b325648f5ce9469a415ce6437986604 = $(`<div id="html_4b325648f5ce9469a415ce6437986604" style="width: 100.0%; height: 100.0%;">Brightness: 301.85, Date: 2025-08-31, Time: 251</div>`)[0];
+                popup_a7f50021c6ac14e3996f60519719995b.setContent(html_4b325648f5ce9469a415ce6437986604);
+            
+        
+
+        circle_marker_6516c73c3848c1538db95f7b3fd690af.bindPopup(popup_a7f50021c6ac14e3996f60519719995b)
+        ;
+
+        
+    
 </script>
 </html>

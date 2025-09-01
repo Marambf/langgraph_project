@@ -1,4 +1,3 @@
-# streamlit_app.py
 import streamlit as st
 from PIL import Image
 from nodes import run_query_direct, create_agent_executor
@@ -6,7 +5,6 @@ import streamlit.components.v1 as components
 import re
 import os
 from translate import detect_and_translate_to_english, translate_from_english
-
 
 # Configuration de la page
 st.set_page_config(page_title="STAC & Fire Chatbot", layout="centered")
@@ -26,7 +24,6 @@ user_input = st.text_input("📥 Entrez votre requête :")
 # Initialiser l’agent (une seule fois au lancement)
 if "agent_executor" not in st.session_state:
     st.session_state.agent_executor = create_agent_executor()
-
 agent_executor = st.session_state.agent_executor
 
 # Détecter si la requête est purement satellite
@@ -36,26 +33,19 @@ def is_satellite_query(text: str) -> bool:
 
 # Fonction traduisant et traitant la requête via l'agent
 def translate_query_and_response(user_input: str, agent):
-    # Détecter la langue et traduire vers l'anglais
     english_input, detected_lang = detect_and_translate_to_english(user_input)
-    
-    # Exécuter l'agent
     response = agent.invoke({"input": english_input})
     if isinstance(response, dict):
         output_text = response.get("output", str(response))
     else:
         output_text = str(response)
-
-    # Traduire le résultat vers la langue d'origine
     return translate_from_english(output_text, detected_lang)
 
+# Extraction de tous les noms de fichiers HTML depuis un texte
+def extract_all_html_filenames(text: str):
+    return re.findall(r'([\w\-]+\.html)', text)
 
-# Extraction du nom du fichier HTML depuis un texte
-def extract_html_filename(text: str) -> str:
-    match = re.search(r'([\w\-]+\.html)', text)
-    return match.group(1) if match else ""
-
-# Affichage de fichier HTML si existe
+# Affichage d'un fichier HTML existant
 def display_html_file(filename: str):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
@@ -63,6 +53,24 @@ def display_html_file(filename: str):
         components.html(html_content, height=600, width=800)
     else:
         st.warning(f"⚠️ Le fichier HTML `{filename}` n'existe pas.")
+
+# Affichage de tous les fichiers HTML détectés dans le texte
+def display_all_html_from_text(text: str):
+    filenames_in_text = extract_all_html_filenames(text)
+    all_html_files = [f for f in os.listdir(".") if f.endswith(".html")]
+
+    for name in filenames_in_text:
+        if name in all_html_files:
+            st.write(f"### Affichage de `{name}` :")
+            display_html_file(name)
+        else:
+            # Cherche un fichier similaire basé sur la partie date ou fin de nom
+            possible_matches = [f for f in all_html_files if name.split("_")[-1] in f]
+            if possible_matches:
+                st.write(f"### Nom dans le texte `{name}` introuvable. Affichage du fichier similaire `{possible_matches[0]}` :")
+                display_html_file(possible_matches[0])
+            else:
+                st.warning(f"⚠️ Aucun fichier HTML correspondant à `{name}` n'a été trouvé.")
 
 # Bouton de recherche
 if st.button("🔍 Rechercher") and user_input:
@@ -94,16 +102,10 @@ if st.button("🔍 Rechercher") and user_input:
                     st.warning("⚠️ La carte ne peut pas être rendue correctement.")
 
             # Cas 3 : Texte contenant une référence à un fichier HTML
-            elif isinstance(result, str) and result.endswith(".html") or ".html" in result:
+            elif isinstance(result, str) and (result.endswith(".html") or ".html" in result):
                 st.write("### Résultat :")
                 st.write(result)
-
-                # Extraire le nom du fichier HTML
-                filename = extract_html_filename(result)
-                if filename:
-                    display_html_file(filename)
-                else:
-                    st.warning("⚠️ Aucun fichier HTML trouvé dans le texte.")
+                display_all_html_from_text(result)
 
             # Cas 4 : Autres résultats
             else:

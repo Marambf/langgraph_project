@@ -8,6 +8,7 @@ import folium
 import re
 from geopy.geocoders import Nominatim
 import time
+from langchain.tools import tool
 
 VALID_DISASTER_TYPES = ["flood", "storm", "earthquake"]
 
@@ -163,8 +164,6 @@ def generate_disaster_map(events, disaster_type="flood", country="Unknown", star
     map_.save(map_filename)
     print(f"✅ Carte générée : {map_filename} (ouvrez-la dans un navigateur)")
     return map_filename
-
-from langchain.tools import tool
 
 @tool
 def query_disaster_events_tool(params: str) -> str:

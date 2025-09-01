@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_a3568ef11bf953ae60c105cd0fc43e0b {
+                #map_12f5c046948032924d5ca20fbaae6749 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,19 +54,19 @@
 <body>
     
     
-            <div class="folium-map" id="map_a3568ef11bf953ae60c105cd0fc43e0b" ></div>
+            <div class="folium-map" id="map_12f5c046948032924d5ca20fbaae6749" ></div>
         
 </body>
 <script>
     
     
-            var map_a3568ef11bf953ae60c105cd0fc43e0b = L.map(
-                "map_a3568ef11bf953ae60c105cd0fc43e0b",
+            var map_12f5c046948032924d5ca20fbaae6749 = L.map(
+                "map_12f5c046948032924d5ca20fbaae6749",
                 {
-                    center: [45.0, 10.0],
+                    center: [40.7127281, -74.0060152],
                     crs: L.CRS.EPSG3857,
                     ...{
-  "zoom": 4,
+  "zoom": 7,
   "zoomControl": true,
   "preferCanvas": false,
 }
@@ -78,7 +78,7 @@
 
         
     
-            var tile_layer_b7f61f1042562d09f18b6dc2d795b647 = L.tileLayer(
+            var tile_layer_4c14dcf268d3e2924c6fd7632b595b3a = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -95,45 +95,7 @@
             );
         
     
-            tile_layer_b7f61f1042562d09f18b6dc2d795b647.addTo(map_a3568ef11bf953ae60c105cd0fc43e0b);
+            tile_layer_4c14dcf268d3e2924c6fd7632b595b3a.addTo(map_12f5c046948032924d5ca20fbaae6749);
         
-    
-            var marker_cce61b4bfeecbf19d7ab653e21da9759 = L.marker(
-                [47.5326534, 25.8345939],
-                {
-}
-            ).addTo(map_a3568ef11bf953ae60c105cd0fc43e0b);
-        
-    
-            var icon_dfb79015f650f9dd090465931d7476b9 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "blue",
-  "iconColor": "white",
-  "icon": "info-sign",
-  "prefix": "glyphicon",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_2113a932c972e648ffc9ab1523dfc8b1 = L.popup({
-  "maxWidth": "100%",
-});
-
-        
-            
-                var html_2d1ed15528a043218f451cdf76db5302 = $(`<div id="html_2d1ed15528a043218f451cdf76db5302" style="width: 100.0%; height: 100.0%;">Suceava, Neamt counties, Romania<br>Du 28/7/2025 au 28/7/2025</div>`)[0];
-                popup_2113a932c972e648ffc9ab1523dfc8b1.setContent(html_2d1ed15528a043218f451cdf76db5302);
-            
-        
-
-        marker_cce61b4bfeecbf19d7ab653e21da9759.bindPopup(popup_2113a932c972e648ffc9ab1523dfc8b1)
-        ;
-
-        
-    
-    
-                marker_cce61b4bfeecbf19d7ab653e21da9759.setIcon(icon_dfb79015f650f9dd090465931d7476b9);
-            
 </script>
 </html>
