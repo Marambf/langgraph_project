@@ -7,7 +7,8 @@ import numpy as np
 import os
 
 MAP_KEY = 'f44596f0cc01c26985abd6bfff78ac92'
-ARCHIVE_DIR = r"C:\Users\DELL\Desktop\fire_archives"
+ARCHIVE_DIR = r"C:\Users\DELL\Documents\langgraph_project"
+
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371
