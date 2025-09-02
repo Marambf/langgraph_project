@@ -21,17 +21,21 @@ st.title("🛰️🔥 Metaplanet Earth Agent")
 # Input utilisateur
 user_input = st.text_input("📥 Entrez votre requête :")
 
-# Initialiser l’agent (une seule fois au lancement)
+# Initialiser l’agent une seule fois
 if "agent_executor" not in st.session_state:
     st.session_state.agent_executor = create_agent_executor()
 agent_executor = st.session_state.agent_executor
 
-# Détecter si la requête est purement satellite
+# Stocker le dernier résultat pour éviter réexécution
+if "last_result" not in st.session_state:
+    st.session_state.last_result = None
+
+# Détection si c’est une requête satellite
 def is_satellite_query(text: str) -> bool:
     text = text.lower()
     return any(k in text for k in ["sentinel", "modis", "viirs", "ndvi", "stac"])
 
-# Fonction traduisant et traitant la requête via l'agent
+# Fonction traduction + traitement agent
 def translate_query_and_response(user_input: str, agent):
     english_input, detected_lang = detect_and_translate_to_english(user_input)
     response = agent.invoke({"input": english_input})
@@ -41,11 +45,11 @@ def translate_query_and_response(user_input: str, agent):
         output_text = str(response)
     return translate_from_english(output_text, detected_lang)
 
-# Extraction de tous les noms de fichiers HTML depuis un texte
+# Extraction des noms de fichiers HTML
 def extract_all_html_filenames(text: str):
     return re.findall(r'([\w\-]+\.html)', text)
 
-# Affichage d'un fichier HTML existant
+# Affichage d’un fichier HTML
 def display_html_file(filename: str):
     if os.path.exists(filename):
         with open(filename, "r", encoding="utf-8") as f:
@@ -54,7 +58,7 @@ def display_html_file(filename: str):
     else:
         st.warning(f"⚠️ Le fichier HTML `{filename}` n'existe pas.")
 
-# Affichage de tous les fichiers HTML détectés dans le texte
+# Affichage de tous les HTML détectés
 def display_all_html_from_text(text: str):
     filenames_in_text = extract_all_html_filenames(text)
     all_html_files = [f for f in os.listdir(".") if f.endswith(".html")]
@@ -64,7 +68,6 @@ def display_all_html_from_text(text: str):
             st.write(f"### Affichage de `{name}` :")
             display_html_file(name)
         else:
-            # Cherche un fichier similaire basé sur la partie date ou fin de nom
             possible_matches = [f for f in all_html_files if name.split("_")[-1] in f]
             if possible_matches:
                 st.write(f"### Nom dans le texte `{name}` introuvable. Affichage du fichier similaire `{possible_matches[0]}` :")
@@ -72,7 +75,7 @@ def display_all_html_from_text(text: str):
             else:
                 st.warning(f"⚠️ Aucun fichier HTML correspondant à `{name}` n'a été trouvé.")
 
-# Bouton de recherche
+# Bouton exécution
 if st.button("🔍 Rechercher") and user_input:
     with st.spinner("⏳ Traitement de la requête..."):
         try:
@@ -81,36 +84,41 @@ if st.button("🔍 Rechercher") and user_input:
             else:
                 result = translate_query_and_response(user_input, agent_executor)
 
+            st.session_state.last_result = result  # 🔑 Sauvegarde résultat
             st.success("✅ Requête traitée avec succès !")
-
-            # Cas 1 : Résultat avec images satellites
-            if isinstance(result, dict) and "images" in result:
-                st.write(f"### Résultats pour la collection `{result.get('collection', 'inconnue')}` :")
-                for img in result["images"]:
-                    cloud = img.get("cloud_cover", "N/A")
-                    caption = f"📅 {img['date']} | ☁️ Nuage: {cloud:.2f}%" if isinstance(cloud, (int, float)) else f"📅 {img['date']} | ☁️ Nuage: {cloud}"
-                    st.image(img.get("thumbnail", ""), caption=caption, width=300)
-
-            # Cas 2 : Résultat contenant une carte Folium
-            elif isinstance(result, dict) and "folium_map" in result:
-                st.write("### Carte générée :")
-                folium_map = result["folium_map"]
-                if hasattr(folium_map, "get_root"):
-                    html = folium_map.get_root().render()
-                    components.html(html, height=600)
-                else:
-                    st.warning("⚠️ La carte ne peut pas être rendue correctement.")
-
-            # Cas 3 : Texte contenant une référence à un fichier HTML
-            elif isinstance(result, str) and (result.endswith(".html") or ".html" in result):
-                st.write("### Résultat :")
-                st.write(result)
-                display_all_html_from_text(result)
-
-            # Cas 4 : Autres résultats
-            else:
-                st.write("### Résultat :")
-                st.write(result)
 
         except Exception as e:
             st.error(f"❌ Erreur lors du traitement : {str(e)}")
+
+# Affichage unique du dernier résultat (évite re-exécution)
+if st.session_state.last_result:
+    result = st.session_state.last_result
+
+    # Cas 1 : Résultat avec images satellites
+    if isinstance(result, dict) and "images" in result:
+        st.write(f"### Résultats pour la collection `{result.get('collection', 'inconnue')}` :")
+        for img in result["images"]:
+            cloud = img.get("cloud_cover", "N/A")
+            caption = f"📅 {img['date']} | ☁️ Nuage: {cloud:.2f}%" if isinstance(cloud, (int, float)) else f"📅 {img['date']} | ☁️ Nuage: {cloud}"
+            st.image(img.get("thumbnail", ""), caption=caption, width=300)
+
+    # Cas 2 : Résultat contenant une carte Folium
+    elif isinstance(result, dict) and "folium_map" in result:
+        st.write("### Carte générée :")
+        folium_map = result["folium_map"]
+        if hasattr(folium_map, "get_root"):
+            html = folium_map.get_root().render()
+            components.html(html, height=600)
+        else:
+            st.warning("⚠️ La carte ne peut pas être rendue correctement.")
+
+    # Cas 3 : Texte contenant un fichier HTML
+    elif isinstance(result, str) and (result.endswith(".html") or ".html" in result):
+        st.write("### Résultat :")
+        st.write(result)
+        display_all_html_from_text(result)
+
+    # Cas 4 : Autres résultats
+    else:
+        st.write("### Résultat :")
+        st.write(result)

@@ -28,9 +28,13 @@ def build_query_params_from_input(user_input: str) -> str:
 
 
 def create_agent_executor():
-    # Récupérer le prompt formaté
+    # Récupérer le prompt
     prompt_template = get_prompt_config("few_shot")
-    system_prompt_str = prompt_template.format(input="Votre question ici")
+    # Si c'est un PromptTemplate, on le formate, sinon on passe l'objet directement
+    if hasattr(prompt_template, "format") and callable(prompt_template.format):
+        system_prompt_str = prompt_template.format(input="Votre question ici")
+    else:
+        system_prompt_str = prompt_template
 
     llm = OllamaLLM(
         model="mistral",

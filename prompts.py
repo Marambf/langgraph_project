@@ -179,14 +179,127 @@ examples = [
     )
 },
 {
-    "question": "Were there any earthquakes in Peru in March 2022?",
+    "question": "Montre-moi les inondations au Pakistan en août 2022",
     "response": (
-        "Action: query_disaster_events_tool(country_name='Peru', date_expression='March 2022', disaster_type='earthquake')\n"
-        "Observation: Earthquakes detected in Peru between 2022-03-01 and 2022-03-31:\n"
-        "- Earthquake in Lima (2022-03-14 ➝ 2022-03-16)\n"
-        "Final Answer: An earthquake was detected in Lima in March 2022."
+        "Action: query_disaster_events_tool(country_name='Pakistan', date_expression='August 2022', disaster_type='flood')\n"
+        "Observation: ✅ Événements 'flood' trouvés en Pakistan entre 2022-08-01 et 2022-08-31 :\n\n"
+        "🌊 **Flood en Pakistan (Sindh)**\n"
+        "📍 Lieu : Sindh\n"
+        "📅 Du 10/8/2022 au 25/8/2022\n"
+        "☠️ Décès : 1200\n"
+        "👥 Personnes affectées : 33,000,000\n"
+        "🧭 Origine : Monsoon rains\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : flood_map_Pakistan_2022-08-10.html\n"
+        "Final Answer: ✅ Événements 'flood' trouvés en Pakistan en août 2022 : inondations majeures au Sindh, avec 1200 morts et 33 millions de personnes affectées."
     )
 },
+{
+    "question": "Montre-moi les tempêtes aux Philippines en novembre 2013",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Philippines', date_expression='November 2013', disaster_type='storm')\n"
+        "Observation: ✅ Événements 'storm' trouvés en Philippines entre 2013-11-01 et 2013-11-30 :\n\n"
+        "🌪️ **Storm en Philippines (Tacloban)**\n"
+        "📍 Lieu : Tacloban\n"
+        "📅 Du 8/11/2013 au 11/11/2013\n"
+        "☠️ Décès : 6300\n"
+        "👥 Personnes affectées : 14,000,000\n"
+        "🧭 Origine : Typhoon Haiyan (Yolanda)\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : storm_map_Philippines_2013-11-08.html\n"
+        "Final Answer: ✅ Événements 'storm' trouvés en Philippines en novembre 2013 : le super typhon Haiyan a frappé Tacloban, causant 6300 morts et affectant 14 millions de personnes."
+    )
+},
+{
+    "question": "Montre-moi les tremblements de terre en Thaïlande le 28 mars 2025",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Thailand', date_expression='2025-03-28', disaster_type='earthquake')\n"
+        "Observation: ✅ Événements 'earthquake' trouvés en Thailand entre 2025-03-28 et 2025-03-28 :\n\n"
+        "🏔️ **Earthquake en Thailand (Bangkok)**\n"
+        "📍 Lieu : Bangkok\n"
+        "📅 Du 28/3/2025 au 28/3/2025\n"
+        "☠️ Décès : 54\n"
+        "👥 Personnes affectées : 2351\n"
+        "🧭 Origine : None\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : earthquake_map_Thailand_2025-03-28.html\n"
+        "Final Answer: ✅ Événements 'earthquake' trouvés en Thailand entre 2025-03-28 et 2025-03-28 : 54 morts et 2351 personnes affectées à Bangkok."
+    )
+},
+{
+    "question": "Were there any extreme temperature events in France in July 2019?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='France', date_expression='July 2019', disaster_type='extreme temperature')\n"
+        "Observation: ✅ Événements 'extreme temperature' trouvés en France entre 2019-07-01 et 2019-07-31 :\n\n"
+        "🥵 **Extreme Temperature en France (Paris)**\n"
+        "📍 Lieu : Paris\n"
+        "📅 Du 22/7/2019 au 28/7/2019\n"
+        "☠️ Décès : 150\n"
+        "👥 Personnes affectées : 500,000\n"
+        "🧭 Origine : Heatwave\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : extreme_temperature_map_France_2019-07-22.html\n"
+        "Final Answer: ✅ Événements 'extreme temperature' en France en juillet 2019 : vague de chaleur à Paris causant 150 décès et affectant 500,000 personnes."
+    )
+},
+{
+    "question": "Were there any droughts in Spain in summer 2022?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Spain', date_expression='summer 2022', disaster_type='drought')\n"
+        "Observation: ✅ Événements 'drought' trouvés en Spain entre 2022-06-01 et 2022-08-31 :\n\n"
+        "🌵 **Drought en Spain (Valencia)**\n"
+        "📍 Lieu : Valencia\n"
+        "📅 Du 15/6/2022 au 20/8/2022\n"
+        "☠️ Décès : Non précisé\n"
+        "👥 Personnes affectées : 2,000,000\n"
+        "🧭 Origine : Heatwave & lack of rainfall\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : drought_map_Spain_2022-06-15.html\n"
+        "Final Answer: ✅ Événements 'drought' trouvés en Espagne durant l’été 2022 : sécheresse sévère à Valencia affectant 2 millions de personnes."
+    )
+},
+{
+    "question": "Montre-moi les accidents industriels en Chine en mai 2015",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='China', date_expression='May 2015', disaster_type='industrial accident')\n"
+        "Observation: ✅ Événements 'industrial accident' trouvés en China entre 2015-05-01 et 2015-05-31 :\n\n"
+        "🏭 **Industrial Accident en China (Tianjin)**\n"
+        "📍 Lieu : Tianjin\n"
+        "📅 Du 12/5/2015 au 12/5/2015\n"
+        "☠️ Décès : 173\n"
+        "👥 Personnes affectées : 800\n"
+        "🧭 Origine : Chemical explosion\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : industrial_accident_map_China_2015-05-12.html\n"
+        "Final Answer: ✅ Événements 'industrial accident' en Chine en mai 2015 : explosion chimique à Tianjin causant 173 morts et 800 personnes affectées."
+    )
+},
+{
+    "question": "Were there any transport accidents in India in January 2020?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='India', date_expression='January 2020', disaster_type='transport')\n"
+        "Observation: ✅ Événements 'transport' trouvés en India entre 2020-01-01 et 2020-01-31 :\n\n"
+        "✈️ **Transport Accident en India (New Delhi)**\n"
+        "📍 Lieu : New Delhi\n"
+        "📅 Du 15/1/2020 au 15/1/2020\n"
+        "☠️ Décès : 18\n"
+        "👥 Personnes affectées : 50\n"
+        "🧭 Origine : Plane crash\n"
+        "--------------------------------------------------\n\n"
+        "🗺️ Une carte a été générée : transport_map_India_2020-01-15.html\n"
+        "Final Answer: ✅ Événements 'transport' en Inde en janvier 2020 : crash d’avion à New Delhi causant 18 morts et affectant 50 personnes."
+    )
+},
+{
+    "question": "Quels tremblements de terre ont eu lieu au Chili entre janvier et mars 2010 ?",
+    "response": (
+        "Action: query_disaster_events_tool(country_name='Chili', date_expression='entre janvier et mars 2010', disaster_type='earthquake')\n"
+        "Observation: Tremblements de terre détectés au Chili entre 2010-01-01 et 2010-03-31 :\n"
+        "- Earthquake in Concepción (2010-02-27 ➝ 2010-02-27)\n"
+        "Final Answer: Un tremblement de terre majeur a été détecté à Concepción au Chili en février 2010."
+    )
+},
+
     
 {
         "question": "Évalue le risque d’infiltration d’eau de surface à Paris",
@@ -451,11 +564,65 @@ examples = [
         "2025-09-02 : Max 21°C / Min 14°C / Pluie 1 mm\n"
         "Final Answer: À Berlin, la température actuelle est de 20°C avec un vent de 9 km/h. Les prochains jours seront compris entre 14 et 23°C avec très peu de pluie."
     )
-}
+},
 
-
-
-
+    {
+        "question": "J'ai un client qui habite en Roumanie, il a dit que sa maison est inondée le 28 juillet 2025",
+        "response": (
+            "Action: query_disaster_events_tool(country_name='Romania', date_expression='2025-07-28', disaster_type='flood')\n"
+            "Observation: 🌊 Inondation détectée en Roumanie, Suceava, comté de Neamt.\n"
+            "Date : 28/07/2025\n"
+            "Décès : 3\n"
+            "Personnes affectées : 2500\n"
+            "Origine : Forte pluie\n"
+            "Final Answer: La maison du client en Roumanie (Suceava, comté de Neamt) a été affectée par une inondation le 28 juillet 2025. Une carte interactive est disponible (`flood_map_Romania_2025-07-28.html`)."
+        )
+    },
+    {
+        "question": "Montre-moi les incendies à Torit le 21 janvier 2013",
+        "response": (
+            "Action: detect_fire_tool(location='Torit', date='2013-01-21')\n"
+            "Observation: 🔥 Incendie détecté à Torit, South Sudan.\n"
+            "Date : 21/01/2013\n"
+            "Décès : [à compléter]\n"
+            "Personnes affectées : [à compléter]\n"
+            "Origine : [à confirmer]\n"
+            "Final Answer: Un incendie a eu lieu à Torit le 21 janvier 2013. Une carte interactive est disponible (`fire_map_Torit_2013-01-21.html`)."
+        )
+    },
+    {
+    "question": "Peux-tu me calculer la route entre Casablanca et Rabat ?",
+    "response": (
+        "Action: route_tool(start='Casablanca', end='Rabat')\n"
+        "Observation: Distance totale : 87.4 km\nDurée estimée : 1 h 05 min\nÉtapes :\n"
+        " 1. Départ sur Casablanca.\n"
+        " 2. Prenez la bretelle à droite sur A1 (12 km).\n"
+        " 3. Continuez tout droit sur A1 (75 km).\n"
+        "Final Answer: L’itinéraire de Casablanca à Rabat dure environ 1 h 05 min pour 87 km. Une carte a été générée (`itineraire.html`)."
+    )
+},
+{
+    "question": "How do I go from New York to Boston?",
+    "response": (
+        "Action: route_tool(start='New York', end='Boston')\n"
+        "Observation: Distance: 346.5 km\nEstimated duration: 3 h 45 min\nSteps:\n"
+        " 1. Start in New York.\n"
+        " 2. Take the ramp right onto I-95 North (15 km).\n"
+        " 3. Continue on I-95 for 320 km.\n"
+        "Final Answer: The trip from New York to Boston is about 346 km and takes around 3 h 45 min. The map has been saved in `itineraire.html`."
+    )
+},
+{
+    "question": "Itinéraire de Marseille à Nice",
+    "response": (
+        "Action: route_tool(start='Marseille', end='Nice')\n"
+        "Observation: Distance totale : 200.7 km\nDurée estimée : 2 h 20 min\nÉtapes :\n"
+        " 1. Départ sur Marseille.\n"
+        " 2. Prenez la sortie vers A50.\n"
+        " 3. Continuez sur A8 direction Nice.\n"
+        "Final Answer: Le trajet Marseille → Nice fait environ 200 km et prend 2 h 20 min. Une carte interactive est disponible (`itineraire.html`)."
+    )
+},
 ]
 
 # Template for each example

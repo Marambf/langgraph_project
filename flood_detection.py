@@ -10,7 +10,12 @@ from geopy.geocoders import Nominatim
 import time
 from langchain.tools import tool
 
-VALID_DISASTER_TYPES = ["flood", "storm", "earthquake"]
+# ✅ Tous les types de catastrophes pris en charge
+VALID_DISASTER_TYPES = [
+    "flood", "storm", "earthquake",
+    "extreme temperature", "drought",
+    "industrial accident", "transport"
+]
 
 def get_iso3_from_country_name(name):
     try:
@@ -31,21 +36,31 @@ def get_emdat_by_iso3(iso3_code):
 def filter_disasters_between_dates(events, start_date, end_date, disaster_type="flood"):
     filtered = []
     for event in events:
-        if event.get("disastertype", "").lower() != disaster_type:
-            continue
+        # Gestion spéciale pour accidents industriels et transport
+        if disaster_type == "industrial accident":
+            if event.get("subgroupname", "").lower() != "industrial accident":
+                continue
+        elif disaster_type == "transport":
+            if event.get("subgroupname", "").lower() != "transport":
+                continue
+        else:
+            if event.get("disastertype", "").lower() != disaster_type:
+                continue
+
         try:
             start_event = datetime(
                 event.get("startyear", 0),
                 event.get("startmonth", 0),
-                event.get("startday", 0)
+                event.get("startday", 0) or 1
             ).date()
             end_event = datetime(
                 event.get("endyear", 0) or event.get("startyear", 0),
                 event.get("endmonth", 0) or event.get("startmonth", 0),
-                event.get("endday", 0) or event.get("startday", 0)
+                event.get("endday", 0) or event.get("startday", 0) or 1
             ).date()
         except Exception:
             continue
+
         if start_event <= end_date and end_event >= start_date:
             filtered.append(event)
     return filtered
@@ -53,14 +68,19 @@ def filter_disasters_between_dates(events, start_date, end_date, disaster_type="
 def format_event_human_readable(event):
     start_date = f"{event.get('startday', '?')}/{event.get('startmonth', '?')}/{event.get('startyear', '?')}"
     end_date = f"{event.get('endday', '?')}/{event.get('endmonth', '?')}/{event.get('endyear', '?')}"
+
     disaster_emoji = {
         "flood": "🌊",
         "storm": "🌪️",
-        "earthquake": "🏔️"
+        "earthquake": "🏔️",
+        "extreme temperature": "🥵",
+        "drought": "🌵",
+        "industrial accident": "🏭",
+        "transport": "✈️"
     }.get(event.get("disastertype", "").lower(), "❗")
 
     return (
-        f"{disaster_emoji} **{event.get('disastertype', '').capitalize()} en {event.get('country', '?')} ({event.get('location', 'Lieu inconnu')})**\n"
+        f"{disaster_emoji} **{event.get('disastertype', event.get('subgroupname', '')).capitalize()} en {event.get('country', '?')} ({event.get('location', 'Lieu inconnu')})**\n"
         f"📍 Lieu : {event.get('location', 'Inconnu')}\n"
         f"📅 Du {start_date} au {end_date}\n"
         f"☠️ Décès : {event.get('totaldeaths', 'Non précisé')}\n"
@@ -98,21 +118,8 @@ def extract_dates_from_text(date_text: str) -> Optional[tuple[datetime.date, dat
     return None
 
 def generate_disaster_map(events, disaster_type="flood", country="Unknown", start_date=None, map_filename=None):
-    if country == "Unknown" and events:
-        country = events[0].get("country", "Unknown")
-    if not start_date and events:
-        try:
-            start_day = events[0].get("startday", 1)
-            start_month = events[0].get("startmonth", 1)
-            start_year = events[0].get("startyear", 2000)
-            start_date = datetime(start_year, start_month, start_day)
-        except:
-            start_date = None
-
-    date_str = start_date.strftime("%Y-%m-%d") if isinstance(start_date, datetime) else "unknown_date"
-    clean_country = re.sub(r'\s+', '_', country.strip()) if country else "unknown"
-    safe_disaster = disaster_type.replace(" ", "_")
-    map_filename = map_filename or f"{safe_disaster}_map_{clean_country}_{date_str}.html"
+    # Forcer toujours le nom du fichier à 'map.html'
+    map_filename = "map.html"
 
     map_ = folium.Map(location=[45, 10], zoom_start=4)
     geolocator = Nominatim(user_agent="disaster_mapper")
@@ -130,7 +137,11 @@ def generate_disaster_map(events, disaster_type="flood", country="Unknown", star
         icon_color = {
             "flood": "blue",
             "storm": "darkred",
-            "earthquake": "green"
+            "earthquake": "green",
+            "extreme temperature": "orange",
+            "drought": "beige",
+            "industrial accident": "black",
+            "transport": "purple"
         }.get(disaster_type, "gray")
 
         if lat and lon:
@@ -165,42 +176,79 @@ def generate_disaster_map(events, disaster_type="flood", country="Unknown", star
     print(f"✅ Carte générée : {map_filename} (ouvrez-la dans un navigateur)")
     return map_filename
 
+
 @tool
 def query_disaster_events_tool(params: str) -> str:
     """
-    Recherche des catastrophes naturelles (inondation, tempête, tremblement de terre) dans un pays donné et pour une date ou plage de dates.
-    Format attendu : 'country_name=Romania date_expression=2025-07-28 disaster_type=flood'
+    Recherche des catastrophes naturelles et technologiques
+    (inondation, tempête, tremblement de terre, température extrême, sécheresse,
+    accident industriel, transport) dans un pays donné et pour une date ou plage de dates.
+    
+    params : texte libre comme "France 2015-06-29 temperature"
     """
-    args = dict(x.split('=') for x in params.split() if '=' in x)
-    country_name = args.get('country_name', '')
-    date_expression = args.get('date_expression', '')
-    disaster_type = args.get('disaster_type', 'flood')
+    # -----------------------
+    # Parse du texte libre
+    # -----------------------
+    words = params.split()
+    if not words:
+        return "❌ Entrée vide."
 
-    if disaster_type.lower() not in VALID_DISASTER_TYPES:
-        return f"❌ Type de catastrophe non reconnu : '{disaster_type}'. Choisissez parmi {', '.join(VALID_DISASTER_TYPES)}."
+    country_name = words[0]  # premier mot = pays
+    # Extraire la date (format ISO yyyy-mm-dd)
+    date_expression = ' '.join([w for w in words[1:] if re.search(r'\d{4}-\d{2}-\d{2}', w)])
+    # Le reste = type de catastrophe
+    disaster_words = [w for w in words[1:] if not re.search(r'\d{4}-\d{2}-\d{2}', w)]
+    disaster_type = ' '.join(disaster_words).lower() or 'flood'
 
+    # Ajustements pour certains types
+    if "temperature" in disaster_type:
+        disaster_type = "extreme temperature"
+    elif "accident" in disaster_type:
+        disaster_type = "industrial accident"
+    elif "transport" in disaster_type:
+        disaster_type = "transport"
+
+    # -----------------------
+    # Code pays ISO3
+    # -----------------------
     iso3 = get_iso3_from_country_name(country_name)
     if not iso3:
         return f"❌ Pays '{country_name}' non reconnu."
 
+    # -----------------------
+    # Extraction des dates
+    # -----------------------
     dates = extract_dates_from_text(date_expression)
     if not dates:
         return f"❌ Impossible d'interpréter la date ou la plage de dates à partir de : '{date_expression}'"
-
     start_date, end_date = dates
+
+    # -----------------------
+    # Récupération des événements
+    # -----------------------
     events = get_emdat_by_iso3(iso3)
     if not events:
         return f"❌ Aucune donnée trouvée pour le pays '{country_name}' (code {iso3})."
 
-    filtered = filter_disasters_between_dates(events, start_date, end_date, disaster_type.lower())
+    filtered = filter_disasters_between_dates(events, start_date, end_date, disaster_type)
     if not filtered:
         return f"✅ Aucun événement '{disaster_type}' trouvé en {country_name} entre {start_date} et {end_date}."
 
-    map_file = generate_disaster_map(filtered, disaster_type.lower(), country_name, start_date)
+    # -----------------------
+    # Génération de la carte
+    # -----------------------
+    map_file = None
+    if disaster_type != "transport":  # pas de carte pour transport
+        map_file = generate_disaster_map(filtered, disaster_type, country_name, start_date)
 
+    # -----------------------
+    # Construction de la réponse
+    # -----------------------
     result = f"✅ Événements '{disaster_type}' trouvés en {country_name} entre {start_date} et {end_date} :\n\n"
     for e in filtered:
         result += format_event_human_readable(e) + "\n"
 
-    result += f"\n🗺️ Une carte a été générée : {map_file}"
-    return f"Final Answer: {result}"
+    if map_file:
+        result += f"\n🗺️ Une carte a été générée : {map_file}"
+
+    return result
