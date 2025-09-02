@@ -9,3 +9,4 @@ pystac_client
 pycountry
 dateparser
 rasterio
+matplotlib
