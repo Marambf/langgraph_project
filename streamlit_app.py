@@ -5,17 +5,8 @@ import streamlit.components.v1 as components
 import re
 import os
 from translate import detect_and_translate_to_english, translate_from_english
-import ollama
 
-# -------------------------
-# Configuration Ollama via ngrok
-# -------------------------
-OLLAMA_HOST = "https://84c407a77cbc.ngrok-free.app"  # ton URL ngrok
-ollama_client = ollama.Client(host=OLLAMA_HOST)
-
-# -------------------------
 # Configuration de la page
-# -------------------------
 st.set_page_config(page_title="STAC & Fire Chatbot", layout="centered")
 
 # Logo
@@ -44,19 +35,14 @@ def is_satellite_query(text: str) -> bool:
     text = text.lower()
     return any(k in text for k in ["sentinel", "modis", "viirs", "ndvi", "stac"])
 
-# Fonction traduction + traitement via Ollama
-def translate_query_and_response(user_input: str):
-    # Détecte la langue et traduit en anglais
+# Fonction traduction + traitement agent
+def translate_query_and_response(user_input: str, agent):
     english_input, detected_lang = detect_and_translate_to_english(user_input)
-    
-    # Appel à Ollama Mistral via ngrok
-    response = ollama_client.chat(model="mistral", messages=[
-        {"role": "user", "content": english_input}
-    ])
-    
-    output_text = response["message"]["content"]
-    
-    # Traduction retour vers la langue détectée
+    response = agent.invoke({"input": english_input})
+    if isinstance(response, dict):
+        output_text = response.get("output", str(response))
+    else:
+        output_text = str(response)
     return translate_from_english(output_text, detected_lang)
 
 # Extraction des noms de fichiers HTML
@@ -96,7 +82,7 @@ if st.button("🔍 Rechercher") and user_input:
             if is_satellite_query(user_input):
                 result = run_query_direct(user_input)
             else:
-                result = translate_query_and_response(user_input)
+                result = translate_query_and_response(user_input, agent_executor)
 
             st.session_state.last_result = result  # 🔑 Sauvegarde résultat
             st.success("✅ Requête traitée avec succès !")

@@ -7,8 +7,7 @@ import numpy as np
 import os
 
 MAP_KEY = 'f44596f0cc01c26985abd6bfff78ac92'
-ARCHIVE_DIR = r"C:\Users\DELL\Documents\langgraph_project"
-
+ARCHIVE_DIR = r"C:\Users\DELL\Desktop\fire_archives"
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371
@@ -170,4 +169,3 @@ def detect_fire_tool(query_text: str) -> str:
 
     except Exception as e:
         return f"❌ Erreur inattendue lors du traitement : {str(e)}"
-
